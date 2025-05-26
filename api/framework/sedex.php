@@ -28,9 +28,6 @@ class Response {
     public function json($data) {
         
         header("Content-Type: application/json");
-        header("Access-Control-Allow-Origin: http://localhost:5173");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
     
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
@@ -104,9 +101,6 @@ class Sedex {
             }
         }
 
-        header("Access-Control-Allow-Origin: http://localhost:5173");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
         http_response_code(404);
         echo json_encode(["error" => "Route not found"]);
