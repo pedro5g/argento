@@ -1,0 +1,185 @@
+@baseURL = http://localhost/finance-app/api/index.php/api
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDgyNjU5NDksImV4cCI6MTc0ODI2OTU0OX0.4BRXpykbXQjOTXIQACRCdn0Su3xENFOf1R3pduUYxZI
+
+
+### @name listAllUsers
+GET {{baseURL}}/user/list
+Authorization: Bearer {{token}}
+
+
+### @name register_user
+POST {{baseURL}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Pedro Martins",
+  "email": "pedro2test@gmail.com",
+  "password": "123456"
+}
+
+### @name login
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "pedro5g@gmail.com",
+  "password": "123456"
+}
+
+### @name profile
+GET {{baseURL}}/user/me
+Authorization: Bearer {{token}}
+
+### @name change_account
+PATCH {{baseURL}}/user/set-account/be77f3f8-ae92-481a-9613-cc9312bdba55
+Authorization: Bearer {{token}}
+
+### @name register_new_account
+POST {{baseURL}}/account/register
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Carteira digital",
+  "type": "crypto", 
+  "balance": 2800
+}
+
+### @name update_balance
+PATCH {{baseURL}}/account/balance
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "balance": 7200
+}
+
+### @name list_user_accounts
+GET {{baseURL}}/account/list
+Authorization: Bearer {{token}}
+
+
+### @name create_category
+POST {{baseURL}}/category/create
+Authorization: Bearer {{token}}
+
+{
+  "name": "Bicos",
+  "type": "income"
+}
+
+### @name list_categories
+GET {{baseURL}}/category/list
+Authorization: Bearer {{token}}
+
+### @name update_category
+PATCH  {{baseURL}}/category/1
+Authorization: Bearer {{token}}
+
+{
+  "name": "Conta de gás",
+  "type": "income"
+}
+
+### @name delete_category
+DELETE   {{baseURL}}/category/2
+Authorization: Bearer {{token}}
+
+
+### @name create_payment_method
+POST {{baseURL}}/payment-method/create
+Authorization: Bearer {{token}}
+
+{
+  "name": "Dinheiro"
+}
+
+### @name list_payment_method
+GET {{baseURL}}/payment-method/list
+Authorization: Bearer {{token}}
+
+### @name update_payment_method
+PATCH  {{baseURL}}/payment-method/1
+Authorization: Bearer {{token}}
+
+{
+   "name": "Cartão de credito"
+}
+
+### @name delete_payment_method
+DELETE   {{baseURL}}/payment-method/2
+Authorization: Bearer {{token}}
+
+
+### @name create_transaction
+POST {{baseURL}}/transactions/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Salário",
+  "description": "Pagamento mensal",
+  "amount": 5000.00,
+  "type": "income",
+  "date": "2025-05-01",
+  "is_scheduled": true,
+  "scheduled_date": "2025-06-02",
+  "confirmed": null,
+  "recurrence": "none",
+  "category_id": 1,
+  "client_id": null,
+  "payment_method_id": 1
+}
+
+### @name update_transaction
+
+PATCH {{baseURL}}/transactions/f3ab6d9f-39dc-11f0-9ee8-f46addeaef5e
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Salário atualizado",
+  "description": "Pagamento reajustado",
+  "amount": 4800.00,
+  "type": "income",
+  "date": "2025-05-01",
+  "is_scheduled": false,
+  "scheduled_date": null,
+  "confirmed": true,
+  "recurrence": "none",
+  "category_id": 1,
+  "client_id": null,
+  "payment_method_id": 1
+}
+
+### @name delete_transaction
+DELETE {{baseURL}}/transactions/a6e432f8-39e2-11f0-9ee8-f46addeaef5e
+Authorization: Bearer {{token}}
+
+### @name get_transaction_by_id
+GET {{baseURL}}/transactions/f3ab6d9f-39dc-11f0-9ee8-f46addeaef5e
+Authorization: Bearer {{token}}
+
+### @name list_transactions
+GET {{baseURL}}/transaction/list
+Authorization: Bearer {{token}}
+
+### @name list_transactions_paginated
+GET {{baseURL}}/transaction/paginated?limit=10&offset=0
+Authorization: Bearer {{token}}
+
+### @name get_transaction_graph
+GET {{baseURL}}/transaction/graph
+Authorization: Bearer {{token}}
+
+### @name list_pending_transactions
+GET {{baseURL}}/transaction/pending
+Authorization: Bearer {{token}}
+
+### @name simulate_pending_impact
+GET {{baseURL}}/transaction/pending/simulate
+Authorization: Bearer {{token}}
+
+### @name confirm_scheduled_transaction
+PATCH {{baseURL}}/transaction/pending/3/confirm
+Authorization: Bearer {{token}}
