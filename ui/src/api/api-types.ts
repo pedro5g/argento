@@ -58,6 +58,32 @@ export type Transaction = {
   created_at: string | Date;
 };
 
+export type ApiError = {
+  response: {
+    data: {
+      error: string;
+    };
+  };
+};
+
 export type UserProfileResponseType = {
   userAccount: UserAccount;
+};
+
+export type RegisterBodyType = {
+  name: string;
+  email: string;
+  password: string;
+};
+export type RegisterResponseType = {
+  message: string;
+};
+
+export type LoginBodyType = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponseType = {
+  token: string;
 };

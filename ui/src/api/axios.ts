@@ -12,7 +12,7 @@ const options = {
 const API = axios.create(options);
 
 API.interceptors.request.use((request) => {
-  const token = cookie.getCookie("access_token")?.value || "";
+  const token = cookie.getCookie("access_token") || "";
   request.headers.Authorization = `Bearer ${token}`;
 
   return request;

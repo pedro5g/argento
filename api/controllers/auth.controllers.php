@@ -21,7 +21,7 @@ class AuthControllers {
     public function login($req, $res) {
         try {
             $token = $this->authServices->login($req->body);
-            return $res->json(["token" => $token]);
+            return $res->json(["token" => $token['token']]);
         } catch (Exception $e) {
             return $res->status(401)->json(["error" => $e->getMessage()]);
         }  

@@ -15,6 +15,7 @@ interface RHFInputProps<T extends FieldValues>
   name: Path<T>;
   label?: string;
   labelClassName?: string;
+  showIssue?: boolean;
   iconLeft?: () => React.JSX.Element;
 }
 
@@ -25,6 +26,7 @@ export const RHFInput = <T extends FieldValues>({
   className,
   type = "text",
   iconLeft: IconLeft,
+  showIssue = true,
   ...props
 }: RHFInputProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,35 +60,45 @@ export const RHFInput = <T extends FieldValues>({
               type={
                 type === "password"
                   ? showPassword
-                    ? "password"
-                    : "text"
+                    ? "text"
+                    : "password"
                   : type
               }
               onChange={onChange}
               value={value}
               className={cn(
-                "py-5 rounded-md border-2 selection:bg-blue-300 focus-visible:ring-0 focus:ring-0 focus-visible:border-blue-400 focus:border-blue-400 data-[error=true]:border-red-400 data-[error=true]:focus-visible:ring-red-400 w-full",
+                "py-5 rounded-md border-2 selection:bg-blue-300 focus-visible:ring-0 focus:ring-0 focus-visible:border-blue-400 focus:border-blue-400 data-[error=true]:border-red-400  data-[error=true]:focus-visible:ring-red-400 w-full",
                 IconLeft && "pl-10",
+                type === "password" && "pr-10",
                 className
               )}
               {...props}
             />
             {IconLeft && (
-              <div className="absolute top-7 left-2 text-zinc-400">
+              <div
+                data-error={invalid}
+                className="absolute top-7 left-2 text-zinc-400 data-[error=true]:[&>svg]:stroke-red-500">
                 <IconLeft />
               </div>
             )}
             {type === "password" && (
               <button
                 type="button"
-                className="absolute top-7 right-2 z-10 text-zinc-400"
+                className="absolute top-8 right-3 z-10 text-zinc-400"
                 onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <Eye size={22} /> : <EyeClosed size={22} />}
+                {showPassword ? <Eye size={18} /> : <EyeClosed size={18} />}
+                <span className="sr-only">
+                  {showPassword ? "hidden password" : "show password"}
+                </span>
               </button>
             )}
-            {invalid && error?.message && (
-              <span className="inline-flex items-center gap-2 text-xs font-light text-red-500 bg-red-100 rounded-md px-2 py-0.5 mt-1">
-                <AlertCircle className="size-4" /> {error.message}
+            {showIssue && invalid && error?.message && (
+              <span
+                aria-live="polite"
+                aria-atomic="true"
+                aria-describedby="helper message"
+                className="inline-flex items-center gap-1 text-sm text-red-500 font-normal rounded-md px-2 py-0.5 mt-1">
+                <AlertCircle size={19} /> {error.message}
               </span>
             )}
           </div>

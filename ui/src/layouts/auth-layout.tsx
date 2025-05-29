@@ -53,7 +53,7 @@ export function AuthLayout() {
             </span>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-center border border-red-500">
+        <div className="flex-1 flex items-center justify-end">
           <Outlet />
         </div>
       </div>

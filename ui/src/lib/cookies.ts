@@ -15,6 +15,8 @@ export type BrowserCookieOpts = {
   sameSite?: "Lax" | "Strict" | "None";
   maxAge?: number;
   secure?: boolean;
+  domain?: string;
+  path?: string;
 };
 
 export interface Cookie {
@@ -28,8 +30,8 @@ export class CookieParser {
     const cookiesStr = Array.isArray(plainCookies)
       ? plainCookies
       : [plainCookies];
-
     const cookies: Array<Cookie> = [];
+
     cookiesStr.forEach((cookieStr) => {
       const parts = cookieStr.split(";").map((part) => part.trim());
       const [key_value, ...options] = parts;
@@ -66,25 +68,30 @@ export class CookieParser {
     cookies.forEach((cookie) => {
       obj[cookie.key] = cookie;
     });
-
     return obj;
   }
 }
 
 export const getCookies = () => {
   if (typeof document === "undefined") return {};
-  const _cookiesStr =
-    document && document.cookie ? document.cookie.split("; ") : [];
-  const __cookies = CookieParser.parser(_cookiesStr);
-  const cookie = CookieParser.fromEntries(__cookies);
-  return cookie;
+
+  const cookies: Record<string, string> = {};
+
+  if (document.cookie) {
+    document.cookie.split(";").forEach((cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      if (key && value) {
+        cookies[decodeURIComponent(key)] = decodeURIComponent(value);
+      }
+    });
+  }
+
+  return cookies;
 };
 
 export const getCookie = (key: string) => {
-  const _cookies = getCookies();
-  const cookie = _cookies?.[key];
-  if (!cookie) return undefined;
-  return cookie;
+  const cookies = getCookies();
+  return cookies[key];
 };
 
 export const setCookie = (
@@ -92,40 +99,52 @@ export const setCookie = (
   value: string,
   options: BrowserCookieOpts = {}
 ) => {
-  if (!document) return;
-  const { days = 7, maxAge, sameSite = "Lax", secure = false } = options;
+  if (typeof document === "undefined") return;
+
+  const {
+    days = 1,
+    maxAge,
+    sameSite = "Lax",
+    secure = false,
+    domain,
+    path = "/",
+  } = options;
 
   let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
 
   if (days && !maxAge) {
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-    cookieString += `;
-       expires=${expires.toUTCString()}`;
+    cookieString += `; expires=${expires.toUTCString()}`;
   }
 
   if (maxAge) {
     cookieString += `; max-age=${maxAge}`;
   }
 
-  cookieString += `; path=/`;
+  cookieString += `; path=${path}`;
+
   cookieString += `; SameSite=${sameSite}`;
-  if (secure) cookieString += `; Secure`;
+
+  if (secure) {
+    cookieString += `; Secure`;
+  }
+
+  if (domain) {
+    cookieString += `; domain=${domain}`;
+  }
 
   document.cookie = cookieString;
 };
 
 export const hasCookie = (key: string) => {
   if (!key) return false;
-  const _cookies = getCookies();
-  if (!_cookies) {
-    return false;
-  }
-  return Object.prototype.hasOwnProperty.call(_cookies, key);
+  const cookies = getCookies();
+  return Object.prototype.hasOwnProperty.call(cookies, key);
 };
 
 export const deleteCookie = (key: string, opts?: BrowserCookieOpts) => {
-  setCookie(key, "", { ...opts, maxAge: -1 });
+  setCookie(key, "", { ...opts, maxAge: -1, days: -1 });
 };
 
 export const cookie = {
