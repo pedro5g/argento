@@ -42,13 +42,21 @@ class AccountControllers {
         try {
             $userId = $req->user['id'];  
             $accounts = $this->accountServices->listAllUserAccounts(["userId" => $userId]);
-            return $res->json(["Accounts" => $accounts]);
+            return $res->json(["accounts" => $accounts]);
         } catch (Exception $e) {
             return $res->status(404)->json(["error" => $e->getMessage()]);
         } 
     }
 
-
+    public function getAccountFinancialSummary($req, $res) {
+        try {
+            $accountId = $req->account['id'];  
+            $summary = $this->accountServices->getAccountFinancialSummary(["accountId" => $accountId]);
+            return $res->json(["data" => $summary]);
+        } catch (Exception $e) {
+            return $res->status(404)->json(["error" => $e->getMessage()]);
+        }
+    }
 
 
 }

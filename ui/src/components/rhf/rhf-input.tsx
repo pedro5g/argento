@@ -1,14 +1,14 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Eye, EyeClosed } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import {
   Controller,
   useFormContext,
   type FieldValues,
   type Path,
 } from "react-hook-form";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface RHFInputProps<T extends FieldValues>
   extends React.ComponentProps<"input"> {
@@ -16,6 +16,7 @@ interface RHFInputProps<T extends FieldValues>
   label?: string;
   labelClassName?: string;
   showIssue?: boolean;
+  mask?: "currency";
   iconLeft?: () => React.JSX.Element;
 }
 
@@ -27,10 +28,25 @@ export const RHFInput = <T extends FieldValues>({
   type = "text",
   iconLeft: IconLeft,
   showIssue = true,
+  mask,
   ...props
 }: RHFInputProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
   const { control } = useFormContext();
+
+  const cleanFormat = (value: string) => {
+    return value.replace(/\D/g, "").trim();
+  };
+
+  const applyMask = useCallback((value: string, maskType?: string) => {
+    if (!value) return "";
+    switch (maskType) {
+      case "currency":
+        return formatCurrency(value);
+      default:
+        return value;
+    }
+  }, []);
 
   return (
     <Controller
@@ -40,8 +56,23 @@ export const RHFInput = <T extends FieldValues>({
         field: { value, onChange, ref },
         fieldState: { invalid, error },
       }) => {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const inputValue = e.target.value;
+          const formattedValue = mask
+            ? applyMask(inputValue, mask)
+            : inputValue;
+
+          if (mask) {
+            onChange(cleanFormat(formattedValue));
+          } else {
+            onChange(inputValue);
+          }
+        };
+
         return (
-          <div className="w-full relative">
+          <div
+            data-error={invalid}
+            className="w-full relative data-[error=false]:focus-within:[&>div>svg]:stroke-blue-500">
             {label && (
               <Label
                 data-error={invalid}
@@ -64,8 +95,8 @@ export const RHFInput = <T extends FieldValues>({
                     : "password"
                   : type
               }
-              onChange={onChange}
-              value={value}
+              onChange={handleChange}
+              value={mask && value ? applyMask(value, mask) : value || ""}
               className={cn(
                 "py-5 rounded-md border-2 selection:bg-blue-300 focus-visible:ring-0 focus:ring-0 focus-visible:border-blue-400 focus:border-blue-400 data-[error=true]:border-red-400  data-[error=true]:focus-visible:ring-red-400 w-full",
                 IconLeft && "pl-10",

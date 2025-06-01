@@ -1,5 +1,5 @@
 @baseURL = http://localhost/finance-app/api/index.php/api
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDgyNjU5NDksImV4cCI6MTc0ODI2OTU0OX0.4BRXpykbXQjOTXIQACRCdn0Su3xENFOf1R3pduUYxZI
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDg3MjcwMTcsImV4cCI6MTc0ODczMDYxN30.m4c4lwnc6bFgAG0HMHpncd8gOTwg7Io599_hotBs8e8
 
 
 ### @name listAllUsers
@@ -40,7 +40,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Carteira digital",
+  "name": "Conta bancaria",
   "type": "crypto", 
   "balance": 2800
 }

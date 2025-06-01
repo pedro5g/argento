@@ -13,7 +13,8 @@ class CategoryControllers {
             $data = [
              "accountId" => $req->account['id'],
              "name" => $req->body['name'],
-             "type" => $req->body['type']
+             "type" => $req->body['type'],
+             "emoji" =>  $req->body['emoji']
             ];  
 
             $this->categoryServices->registerCategory($data);

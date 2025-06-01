@@ -92,7 +92,7 @@ $app->post("/account/register", [$accountControllers, "registerNewAccount"], [
     validateBody([
         "name" => ["type" => "string", "min" => "3", "max" => "100"],
         "balance" => ["type" => "number"],
-        "type" => ["type" => "string", "enum" => ["back", "cash", "digital", "crypto"]]
+        "type" => ["type" => "string", "enum" => ["bank", "cash", "digital", "crypto"]]
     ])
 ]);
 $app->get("/account/list", [$accountControllers, "listAllUserAccounts"], [$auth]);
@@ -102,6 +102,7 @@ $app->patch("/account/balance", [$accountControllers, "updateAccountBalance"], [
         "balance" => ["type" => "number"],
     ])
 ]);
+$app->get("/account/financial-summary", [$accountControllers, "getAccountFinancialSummary"], [$auth]);
 
 ## category routes
 $app->post("/category/create", [$categoryControllers, "createNewCategory"], [

@@ -26,7 +26,8 @@ ADD FOREIGN KEY (current_account_id) REFERENCES accounts(id) ON DELETE SET NULL;
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    type ENUM('income', 'expense') NOT NULL
+    type ENUM('income', 'expense') NOT NULL,
+    emoji VARCHAR(64) NOT NULL DEFAULT 🚀,
     account_id VARCHAR(36),
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );

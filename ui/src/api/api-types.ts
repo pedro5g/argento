@@ -58,6 +58,59 @@ export type Transaction = {
   created_at: string | Date;
 };
 
+export interface AccountFinancialSummary {
+  accountId: string;
+  accountName: string;
+  accountType: "bank" | "cash" | "digital" | "crypto";
+  currentBalance: number;
+
+  confirmedIncome: number;
+  pendingIncome: number;
+  totalIncome: number;
+
+  confirmedExpenses: number;
+  pendingExpenses: number;
+  totalExpenses: number;
+
+  confirmedNetBalance: number;
+  pendingNetBalance: number;
+  totalNetBalance: number;
+  projectedBalance: number;
+
+  confirmedIncomeCount: number;
+  confirmedExpensesCount: number;
+  pendingIncomeCount: number;
+  pendingExpensesCount: number;
+  totalTransactions: number;
+  totalConfirmedTransactions: number;
+  totalPendingTransactions: number;
+}
+
+export interface AccountPeriodSummary {
+  accountId: string;
+  accountName: string;
+  accountType: "bank" | "cash" | "digital" | "crypto";
+  currentBalance: number;
+  periodConfirmedIncome: number;
+  periodConfirmedExpenses: number;
+  periodPendingIncome: number;
+  periodPendingExpenses: number;
+  periodTotalIncome: number;
+  periodTotalExpenses: number;
+  periodConfirmedNet: number;
+  periodPendingNet: number;
+  periodTotalNet: number;
+  periodIncomeCount: number;
+  periodExpenseCount: number;
+  periodConfirmedCount: number;
+  periodPendingCount: number;
+  periodTotalTransactions: number;
+}
+
+export interface PeriodSummaryResponse {
+  data: AccountPeriodSummary | null;
+}
+
 export type ApiError = {
   response: {
     data: {
@@ -86,4 +139,30 @@ export type LoginBodyType = {
 
 export type LoginResponseType = {
   token: string;
+};
+
+export type ListUserAccountResponseType = {
+  accounts: Account[];
+};
+
+export type RegisterAccountBodyType = {
+  name: string;
+  type: AccountType;
+  balance: number;
+};
+
+export type RegisterAccountResponseType = {
+  message: string;
+};
+
+export type SetCurrentAccountBodyType = {
+  accountId: string;
+};
+
+export type SetCurrentAccountResponseType = {
+  message: string;
+};
+
+export type GetFinancialSummaryResponseType = {
+  data: AccountFinancialSummary | null;
 };

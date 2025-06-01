@@ -10,6 +10,13 @@ class AccountServices {
 
 
     public function registerAccount($data){
+        if($this->accountRepository->findAccountWithUserIdAndName([
+            "userId" => $data['userId'],
+            "name" => $data['name']
+        ])){
+            throw new Exception("You already has an account with this name");
+        }
+        
         $this->accountRepository->registerAccount([
             "userId" => $data['userId'],
             "name" => $data['name'],
@@ -30,6 +37,9 @@ class AccountServices {
         return $this->accountRepository->listUserAccounts($data['userId']);
     }
 
+    public function getAccountFinancialSummary($data) {
+        return $this->accountRepository->getAccountFinancialSummary($data['accountId']);
+    }
 
 }
 

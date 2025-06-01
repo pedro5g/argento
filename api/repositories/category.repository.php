@@ -10,14 +10,14 @@ class CategoryRepository {
     }
 
     public function registerCategory($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO categories (name, type, account_id) VALUES (?, ?, ?)");         
+        $stmt = $this->pdo->prepare("INSERT INTO categories (name, type, emoji, account_id) VALUES (?, ?, ?, ?)");         
 
-        $stmt->execute([$data['name'], $data['type'], $data['accountId']]);
+        $stmt->execute([$data['name'], $data['type'], $data['emoji'], $data['accountId']]);
     }
 
     public function updateCategory($categoryId, $data) {
-        $stmt = $this->pdo->prepare("UPDATE categories SET name = ?, type = ? WHERE id = ?");
-        $stmt->execute([$data['name'], $data['type'], $categoryId]);
+        $stmt = $this->pdo->prepare("UPDATE categories SET name = ?, type = ?, emoji = ? WHERE id = ?");
+        $stmt->execute([$data['name'], $data['type'], $data['emoji'], $categoryId]);
     }
 
     public function deleteCategory($categoryId) {
@@ -32,7 +32,7 @@ class CategoryRepository {
     }
 
     public function listCategories($accountId) {
-        $stmt = $this->pdo->prepare("SELECT id, name, type FROM categories WHERE account_id = ?");
+        $stmt = $this->pdo->prepare("SELECT id, name, type, emoji FROM categories WHERE account_id = ?");
         $stmt->execute([$accountId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

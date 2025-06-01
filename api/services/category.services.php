@@ -14,6 +14,7 @@ class CategoryServices {
         $this->categoryRepository->registerCategory([
             "name" => $data['name'],
             "type" => $data['type'],
+            "emoji" => $data['emoji'],
             "accountId" => $data['accountId']
         ]);
         return;
