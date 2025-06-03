@@ -1,4 +1,6 @@
 import type {
+  GetCategoriesBodyType,
+  GetCategoriesResponseType,
   GetFinancialSummaryResponseType,
   ListUserAccountResponseType,
   LoginBodyType,
@@ -6,7 +8,10 @@ import type {
   RegisterAccountBodyType,
   RegisterAccountResponseType,
   RegisterBodyType,
+  RegisterNewCategoryBodyType,
   RegisterResponseType,
+  RegisterTransactionBodyType,
+  RegisterTransactionResponseType,
   SetCurrentAccountBodyType,
   SetCurrentAccountResponseType,
   UserProfileResponseType,
@@ -54,5 +59,34 @@ export const ApiRegisterAccount = async <B extends RegisterAccountBodyType>(
 export const ApiGetFinancialSummary = async () => {
   return await httpClient.GET<GetFinancialSummaryResponseType>(
     "/account/financial-summary"
+  );
+};
+
+// Category routes
+
+export const ApiRegisterNewCategory = async <
+  T extends RegisterNewCategoryBodyType
+>(
+  body: T
+) => {
+  return await httpClient.POST("/category/create", body);
+};
+
+export const ApiGetCategories = async <T extends GetCategoriesBodyType>({
+  type,
+}: T) => {
+  return await httpClient.GET<GetCategoriesResponseType>(
+    `/category/list?type=${type}`
+  );
+};
+
+export const ApiRegisterTransaction = async <
+  T extends RegisterTransactionBodyType
+>(
+  body: T
+) => {
+  return await httpClient.POST<RegisterTransactionResponseType, T>(
+    "/transactions/create",
+    body
   );
 };

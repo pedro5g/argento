@@ -23,6 +23,7 @@ export type Category = {
   id: number;
   name: string;
   type: CategoryTypes;
+  emoji: string;
 };
 
 export type Client = {
@@ -165,4 +166,41 @@ export type SetCurrentAccountResponseType = {
 
 export type GetFinancialSummaryResponseType = {
   data: AccountFinancialSummary | null;
+};
+
+export type GetCategoriesBodyType = {
+  type: CategoryTypes;
+};
+
+export type GetCategoriesResponseType = {
+  categories: Category[];
+};
+
+export type RegisterNewCategoryBodyType = {
+  name: string;
+  emoji: string;
+  type: CategoryTypes;
+};
+
+export type RegisterNewCategoryResponseType = {
+  message: string;
+};
+
+export type RegisterTransactionBodyType = {
+  title: string;
+  description?: string | undefined;
+  type: CategoryTypes;
+  amount: number;
+  date: Date;
+  is_scheduled: boolean;
+  scheduled_date?: Date | undefined;
+  confirmed: boolean | null;
+  recurrence: RecurrenceType;
+  category_id: number;
+  client_id?: string | undefined;
+  payment_method_id?: number | undefined;
+};
+
+export type RegisterTransactionResponseType = {
+  message: string;
 };

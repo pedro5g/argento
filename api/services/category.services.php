@@ -40,7 +40,10 @@ class CategoryServices {
 
 
     public function listCategories($data) {
-        return $this->categoryRepository->listCategories($data['accountId']);
+        return $this->categoryRepository->listCategories([
+            "accountId" =>  $data['accountId'],
+            "type" => $data['type']
+        ]);
     }
 
 

@@ -31,9 +31,9 @@ class CategoryRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function listCategories($accountId) {
-        $stmt = $this->pdo->prepare("SELECT id, name, type, emoji FROM categories WHERE account_id = ?");
-        $stmt->execute([$accountId]);
+    public function listCategories($data) {
+        $stmt = $this->pdo->prepare("SELECT id, name, type, emoji FROM categories WHERE account_id = ? AND type = ?");
+        $stmt->execute([$data['accountId'], $data['type']]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

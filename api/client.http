@@ -1,5 +1,5 @@
 @baseURL = http://localhost/finance-app/api/index.php/api
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDg3MjcwMTcsImV4cCI6MTc0ODczMDYxN30.m4c4lwnc6bFgAG0HMHpncd8gOTwg7Io599_hotBs8e8
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDg5NTIxODUsImV4cCI6MTc0ODk1NTc4NX0.7fnJc_fiQ0QDj4JRIKBRTIskvBBGreCRI83Jxci-sZ4
 
 
 ### @name listAllUsers
@@ -107,9 +107,40 @@ Authorization: Bearer {{token}}
 }
 
 ### @name delete_payment_method
-DELETE   {{baseURL}}/payment-method/2
+DELETE {{baseURL}}/payment-method/2
 Authorization: Bearer {{token}}
 
+
+### @name create_client
+POST {{baseURL}}/client/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Vitor",
+  "email": null,
+  "phone": null
+}
+
+
+### @name update_client
+PATCH {{baseURL}}/client/update/638c8d2f-4073-11f0-bbdd-f46addeaef5e
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Murilo",
+  "email": "murilo@gmail.com",
+  "phone": "1599886435"
+}
+
+### @name delete_client
+DELETE {{baseURL}}/client/delete/99fc9d2f-4073-11f0-bbdd-f46addeaef5e
+Authorization: Bearer {{token}}
+
+### @name list_clients
+GET {{baseURL}}/client/list
+Authorization: Bearer {{token}}
 
 ### @name create_transaction
 POST {{baseURL}}/transactions/create

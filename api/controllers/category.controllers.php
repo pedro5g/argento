@@ -53,7 +53,11 @@ class CategoryControllers {
     public function listAllCategories($req, $res){
         try {
             $accountId = $req->account['id'];  
-            $categories = $this->categoryServices->listCategories(["accountId" => $accountId]);
+            $type = $req->query['type'];
+            $categories = $this->categoryServices->listCategories([
+                "accountId" => $accountId,
+                "type" =>  $type
+            ]);
             return $res->json(["categories" => $categories]);
         } catch (Exception $e) {
             return $res->status(404)->json(["error" => $e->getMessage()]);

@@ -7,6 +7,7 @@ require_once './repositories/user.repository.php';
 require_once './repositories/account.repository.php';
 require_once './repositories/category.repository.php';
 require_once './repositories/payment-method.repository.php';
+require_once './repositories/client.repository.php';
 require_once './repositories/transaction.repository.php';
 
 require_once './services/auth.services.php';
@@ -14,6 +15,7 @@ require_once './services/user.services.php';
 require_once './services/account.services.php';
 require_once './services/category.services.php';
 require_once './services/payment-method.services.php';
+require_once './services/client.services.php';
 require_once './services/transaction.services.php';
 
 require_once './controllers/auth.controllers.php';
@@ -21,6 +23,7 @@ require_once './controllers/user.controllers.php';
 require_once './controllers/account.controllers.php';
 require_once './controllers/category.controllers.php';
 require_once './controllers/payment-method.controllers.php';
+require_once './controllers/client.controllers.php';
 require_once './controllers/transaction.controllers.php';
 
 require_once './middlewares/validate-body.middleware.php';
@@ -50,6 +53,7 @@ $userRepository = new UserRepository($conn);
 $accountRepository = new AccountRepository($conn);
 $categoryRepository = new CategoryRepository($conn);
 $paymentMethodRepository = new PaymentMethodRepository($conn);
+$clientRepository = new ClientRepository($conn);
 $transactionRepository = new TransactionRepository($conn);
 
 ## Services
@@ -58,6 +62,7 @@ $userServices = new UserServices($userRepository, $accountRepository);
 $accountServices = new AccountServices($accountRepository);
 $categoryServices = new CategoryServices($categoryRepository);
 $paymentMethodServices = new PaymentMethodServices($paymentMethodRepository);
+$clientServices = new ClientServices($clientRepository);
 $transactionServices = new TransactionServices($transactionRepository);
 
 ## Controllers
@@ -66,6 +71,7 @@ $userControllers = new UserControllers($userServices);
 $accountControllers = new AccountControllers($accountServices);
 $categoryControllers = new CategoryControllers($categoryServices);
 $paymentMethodControllers = new PaymentMethodControllers($paymentMethodServices);
+$clientControllers = new ClientControllers($clientServices);
 $transactionControllers = new TransactionControllers($transactionServices);
 
 
@@ -137,6 +143,26 @@ $app->patch("/payment-method/:paymentId", [$paymentMethodControllers, "updatePay
 ]);
 $app->delete("/payment-method/:paymentId", [$paymentMethodControllers, "deletePaymentMethod"], [$auth]);
 $app->get("/payment-method/list", [$paymentMethodControllers, "listPaymentMethods"], [$auth]);
+
+### clients routes
+
+$app->post("/client/create", [$clientControllers, "createClient"], [$auth,  
+    validateBody([
+        "name" => ["type" => "string", "min" => "3", "max" => "100"],
+        "email" => ["type" => "string", "email" => true, "optional" => true],
+        "phone" => ["type" => "string", "optional" => true],
+    ])
+]);
+$app->patch("/client/update/:clientId", [$clientControllers, "updateClient"], [$auth,
+    validateBody([
+        "name" => ["type" => "string", "min" => "3", "max" => "100"],
+        "email" => ["type" => "string", "email" => true, "optional" => true],
+        "phone" => ["type" => "string", "optional" => true],
+    ])
+]);
+$app->delete("/client/delete/:clientId", [$clientControllers, "deleteClient"], [$auth]);
+$app->get("/client/list", [$clientControllers, "listAllClients"], [$auth]);
+
 
 ## transaction routes
 $app->post("/transactions/create", [$transactionControllers, "createTransaction"], [

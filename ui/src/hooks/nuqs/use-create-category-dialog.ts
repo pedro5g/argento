@@ -1,8 +1,8 @@
 import { useQueryState, parseAsBoolean } from "nuqs";
 
-export function useOpenAddNewAccountDialog() {
+export function useCreateCategoryDialog() {
   const [open, setOpen] = useQueryState(
-    "open-new-account-dialog",
+    "open-create-category-dialog",
     parseAsBoolean.withDefault(false)
   );
 
