@@ -64,7 +64,7 @@ const formSchema = z.object({
 
 export type FormType = z.infer<typeof formSchema>;
 
-export const CreateInvoiceTransactionDialog = () => {
+export const CreateIncomeTransactionDialog = () => {
   const [open, setOpen] = useState(false);
   const forms = useForm({
     resolver: zodResolver(formSchema),
@@ -175,7 +175,7 @@ export const CreateInvoiceTransactionDialog = () => {
                     <RHFInput<FormType>
                       label="Title"
                       name="title"
-                      iconLeft={() => <Tag className="h-5 w-5 mt-0.5" />}
+                      iconLeft={() => <Tag />}
                     />
                     <p className="text-sm text-gray-500 mt-1">
                       Enter a descriptive title for your income
@@ -187,7 +187,7 @@ export const CreateInvoiceTransactionDialog = () => {
                       label="Amount"
                       name="amount"
                       mask="currency"
-                      iconLeft={() => <DollarSign className="h-5 w-5" />}
+                      iconLeft={() => <DollarSign />}
                     />
                     <p className="text-sm text-gray-500 mt-1">
                       Enter the income amount in BRL

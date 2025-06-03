@@ -133,6 +133,7 @@ $app->post("/payment-method/create", [$paymentMethodControllers, "createPaymentM
     $auth,
     validateBody([
         "name" => ["type" => "string", "min" => "3", "max" => "100"],
+        "emoji" => ["type" => "string", "min" => "3", "max" => "100"],
     ])
 ]);
 $app->patch("/payment-method/:paymentId", [$paymentMethodControllers, "updatePaymentMethod"], [

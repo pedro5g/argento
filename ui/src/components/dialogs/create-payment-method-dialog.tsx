@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -6,33 +7,26 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Separator } from "../ui/separator";
-import type { ApiError, CategoryTypes } from "@/api/api-types";
+import { PlusSquare, Bookmark } from "lucide-react";
 import { Button } from "../ui/button";
-import { Bookmark, PlusSquare, Tag } from "lucide-react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { RHFEmojiPicker } from "../rhf/rhf-emoji-picker";
 import { RHFForm } from "../rhf/rhf-form";
 import { RHFInput } from "../rhf/rhf-input";
-import { RHFSelect } from "../rhf/rhf-select";
-import { RHFEmojiPicker } from "../rhf/rhf-emoji-picker";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiRegisterNewCategory } from "@/api/endpoints";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ApiCreatePaymentMethod } from "@/api/endpoints";
+import type { ApiError } from "@/api/api-types";
 
 const formSchema = z.object({
-  name: z.string().trim().min(1),
+  name: z.string().trim().min(3),
   emoji: z.string().emoji(),
-  type: z.enum(["income", "expense"]),
 });
 
 type FormType = z.infer<typeof formSchema>;
 
-interface CreateCategoryDialogProps {
-  type?: CategoryTypes;
-}
-
-export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
+export const CreatePaymentMethodDialog = () => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -40,28 +34,26 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      emoji: type ? (type === "income" ? "💵" : "😫") : "🤑",
-      type: type ? type : "income",
+      emoji: "💵",
     },
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (body: FormType) => ApiRegisterNewCategory(body),
-    onSuccess: async () => {
+    mutationFn: (body: FormType) => ApiCreatePaymentMethod(body),
+    onSuccess: async ({ message }) => {
+      console.log(message);
       await queryClient.refetchQueries({
-        queryKey: ["categories"],
+        queryKey: ["payment-methods"],
       });
-      forms.reset();
-      setOpen(false);
     },
     onError: (error: ApiError) => {
-      console.log(error);
+      console.error(error);
     },
   });
 
-  const onSubmit = ({ name, emoji, type }: FormType) => {
+  const onSubmit = ({ name, emoji }: FormType) => {
     if (isPending) return;
-    mutate({ name, emoji, type });
+    mutate({ name, emoji });
   };
 
   return (
@@ -76,44 +68,26 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Create category</DialogTitle>
+        <DialogTitle>Add new payment method</DialogTitle>
         <DialogDescription>
-          Organize your finances into different categories
+          To better organize your expenses, say how they were paid
         </DialogDescription>
         <Separator />
         <RHFForm methods={forms}>
-          <form
-            id="crate_category_form"
-            onSubmit={forms.handleSubmit(onSubmit)}
-            className="space-y-6">
+          <form onSubmit={forms.handleSubmit(onSubmit)} className="space-y-6">
             <div className="w-full flex flex-col items-center justify-center gap-4">
               <RHFEmojiPicker<FormType> name="emoji" />
               <p className="text-zinc-400 text-xs mr-auto">
-                Style your categories with emojis
+                Style your payment with emojis
               </p>
             </div>
             <div>
               <RHFInput<FormType>
-                label="Category name"
+                label="Payment name"
                 name="name"
-                iconLeft={() => <Bookmark />}
+                iconLeft={() => <Bookmark className="size-5" />}
               />
-              <p className="text-zinc-400 text-xs mr-auto mt-2">
-                Enter a descriptive name for your new category
-              </p>
             </div>
-            {!type && (
-              <RHFSelect<FormType>
-                name="type"
-                label="Category type"
-                options={[
-                  { title: "Income", value: "income" },
-                  { title: "Expense", value: "expense" },
-                ]}
-                iconLeft={() => <Tag className="size-5" />}
-              />
-            )}
-
             <div className="w-full inline-flex items-center justify-end gap-4">
               <div>
                 <Button
@@ -126,9 +100,7 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
                 </Button>
               </div>
               <div>
-                <Button form="crate_category_form" variant="blue">
-                  Cadastrar
-                </Button>
+                <Button variant="blue">Cadastrar</Button>
               </div>
             </div>
           </form>

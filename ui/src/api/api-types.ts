@@ -36,6 +36,7 @@ export type Client = {
 export type PaymentMethod = {
   id: number;
   name: string;
+  emoji: string;
 };
 
 export type RecurrenceType = "none" | "daily" | "weekly" | "monthly" | "yearly";
@@ -203,4 +204,55 @@ export type RegisterTransactionBodyType = {
 
 export type RegisterTransactionResponseType = {
   message: string;
+};
+
+export type PaymentMethodBaseResponseType = {
+  message: string;
+};
+
+export type PaymentMethodsResponseType = {
+  paymentMethods: PaymentMethod[];
+};
+
+export type DeletePaymentMethodBodyType = {
+  id: number;
+};
+
+export type UpdatePaymentMethodBodyType = {
+  id: number;
+  name: string;
+};
+
+export type CreatePaymentMethodBodyType = {
+  name: string;
+  emoji: string;
+};
+
+export type CreatePaymentMethodResponseType = {
+  message: string;
+};
+
+export type ClientBaseResponseType = {
+  message: string;
+};
+
+export type ListClientsResponseType = {
+  clients: Client[];
+};
+
+export type RegisterClientBodyType = {
+  name: string;
+  email: string | null;
+  phone: string | null;
+};
+
+export type UpdateClientBodyType = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+};
+
+export type DeleteClientBodyType = {
+  id: string;
 };

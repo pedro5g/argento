@@ -13,6 +13,7 @@ class PaymentMethodControllers {
             $data = [
              "userId" => $req->user['id'],
              "name" => $req->body['name'],
+             "emoji" => $req->body['emoji']
             ];  
 
             $this->paymentMethodServices->createPaymentMethod($data);

@@ -1,19 +1,30 @@
 import type {
+  ClientBaseResponseType,
+  CreatePaymentMethodBodyType,
+  CreatePaymentMethodResponseType,
+  DeleteClientBodyType,
+  DeletePaymentMethodBodyType,
   GetCategoriesBodyType,
   GetCategoriesResponseType,
   GetFinancialSummaryResponseType,
+  ListClientsResponseType,
   ListUserAccountResponseType,
   LoginBodyType,
   LoginResponseType,
+  PaymentMethodBaseResponseType,
+  PaymentMethodsResponseType,
   RegisterAccountBodyType,
   RegisterAccountResponseType,
   RegisterBodyType,
+  RegisterClientBodyType,
   RegisterNewCategoryBodyType,
   RegisterResponseType,
   RegisterTransactionBodyType,
   RegisterTransactionResponseType,
   SetCurrentAccountBodyType,
   SetCurrentAccountResponseType,
+  UpdateClientBodyType,
+  UpdatePaymentMethodBodyType,
   UserProfileResponseType,
 } from "./api-types";
 import { httpClient } from "./axios";
@@ -89,4 +100,74 @@ export const ApiRegisterTransaction = async <
     "/transactions/create",
     body
   );
+};
+
+export const ApiCreatePaymentMethod = async <
+  T extends CreatePaymentMethodBodyType
+>(
+  body: T
+) => {
+  return await httpClient.POST<CreatePaymentMethodResponseType, T>(
+    "/payment-method/create",
+    body
+  );
+};
+
+export const ApiUpdatePaymentMethod = async <
+  T extends UpdatePaymentMethodBodyType
+>({
+  id,
+  ...body
+}: T) => {
+  return await httpClient.PATCH<PaymentMethodBaseResponseType, typeof body>(
+    `/payment-method/${id}`,
+    body
+  );
+};
+
+export const ApiDeletePaymentMethod = async <
+  T extends DeletePaymentMethodBodyType
+>({
+  id,
+}: T) => {
+  return await httpClient.DELETE<PaymentMethodBaseResponseType>(
+    `/payment-method/${id}`
+  );
+};
+
+export const ApiListPaymentMethods = async () => {
+  return await httpClient.GET<PaymentMethodsResponseType>(
+    "/payment-method/list"
+  );
+};
+
+export const ApiRegisterClient = async <T extends RegisterClientBodyType>(
+  body: T
+) => {
+  return await httpClient.POST<ClientBaseResponseType, T>(
+    "/client/create",
+    body
+  );
+};
+
+export const ApiUpdateClient = async <T extends UpdateClientBodyType>({
+  id,
+  ...body
+}: T) => {
+  return await httpClient.PATCH<ClientBaseResponseType, typeof body>(
+    `/client/update/${id}`,
+    body
+  );
+};
+
+export const ApiDeleteClient = async <T extends DeleteClientBodyType>({
+  id,
+}: T) => {
+  return await httpClient.DELETE<ClientBaseResponseType>(
+    `/client/delete/${id}`
+  );
+};
+
+export const ApiListClients = async () => {
+  return await httpClient.GET<ListClientsResponseType>("/client/list");
 };

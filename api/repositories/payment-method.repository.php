@@ -10,8 +10,8 @@ class PaymentMethodRepository {
     }
 
     public function registerPaymentMethod($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO payment_methods (name, user_id) VALUES (?, ?)");         
-        $stmt->execute([$data['name'], $data['userId']]);
+        $stmt = $this->pdo->prepare("INSERT INTO payment_methods (name, emoji, user_id) VALUES (?, ?, ?)");         
+        $stmt->execute([$data['name'], $data['emoji'], $data['userId']]);
     }
 
     public function findById($id) {
@@ -31,7 +31,7 @@ class PaymentMethodRepository {
     }
 
     public function getAllPaymentMethods($userId) {
-        $stmt = $this->pdo->prepare("SELECT id, name FROM payment_methods WHERE user_id = ?");
+        $stmt = $this->pdo->prepare("SELECT id, name, emoji FROM payment_methods WHERE user_id = ?");
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

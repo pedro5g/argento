@@ -13,6 +13,7 @@ class PaymentMethodServices {
     public function createPaymentMethod($data){
         $this->paymentMethodRepository->registerPaymentMethod([
             "name" => $data['name'],
+            "emoji" => $data['emoji'],
             "userId" => $data['userId']
         ]);
         return;

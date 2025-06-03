@@ -44,6 +44,7 @@ CREATE TABLE clients (
 CREATE TABLE payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
+    emoji VARCHAR(64) NOT NULL DEFAULT 💵,
     user_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
