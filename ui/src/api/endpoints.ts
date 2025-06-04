@@ -2,6 +2,8 @@ import type {
   ClientBaseResponseType,
   CreatePaymentMethodBodyType,
   CreatePaymentMethodResponseType,
+  DeleteCategoryBodyType,
+  DeleteCategoryResponseType,
   DeleteClientBodyType,
   DeletePaymentMethodBodyType,
   GetCategoriesBodyType,
@@ -23,6 +25,7 @@ import type {
   RegisterTransactionResponseType,
   SetCurrentAccountBodyType,
   SetCurrentAccountResponseType,
+  UpdateCategoryBodyType,
   UpdateClientBodyType,
   UpdatePaymentMethodBodyType,
   UserProfileResponseType,
@@ -83,11 +86,27 @@ export const ApiRegisterNewCategory = async <
   return await httpClient.POST("/category/create", body);
 };
 
+export const ApiUpdateCategory = async <T extends UpdateCategoryBodyType>({
+  id,
+  ...body
+}: T) => {
+  return await httpClient.PATCH<DeleteCategoryResponseType, typeof body>(
+    `/category/${id}`,
+    body
+  );
+};
+
+export const ApiDeleteCategory = async <T extends DeleteCategoryBodyType>({
+  id,
+}: T) => {
+  return await httpClient.DELETE(`/category/${id}`);
+};
+
 export const ApiGetCategories = async <T extends GetCategoriesBodyType>({
   type,
 }: T) => {
   return await httpClient.GET<GetCategoriesResponseType>(
-    `/category/list?type=${type}`
+    `/category/list?type=${type.join(",")}`
   );
 };
 

@@ -22,8 +22,8 @@ const navMain = [
     icon: HomeIcon,
   },
   {
-    title: "Accounts",
-    url: "/accounts",
+    title: "Account",
+    url: "/account",
     icon: WalletIcon,
   },
   {

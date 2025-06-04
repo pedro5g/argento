@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Eye, EyeClosed } from "lucide-react";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, formatPhone } from "@/lib/utils";
 import {
   Controller,
   useFormContext,
@@ -16,7 +16,7 @@ interface RHFInputProps<T extends FieldValues>
   label?: string;
   labelClassName?: string;
   showIssue?: boolean;
-  mask?: "currency";
+  mask?: "currency" | "phone";
   iconLeft?: () => React.JSX.Element;
 }
 
@@ -43,6 +43,8 @@ export const RHFInput = <T extends FieldValues>({
     switch (maskType) {
       case "currency":
         return formatCurrency(value);
+      case "phone":
+        return formatPhone(value);
       default:
         return value;
     }

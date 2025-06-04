@@ -15,8 +15,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiRegisterClient } from "@/api/endpoints";
-import type { ApiError } from "@/api/api-types";
+import { ApiRegisterClient, ApiUpdateClient } from "@/api/endpoints";
+import type { ApiError, Client } from "@/api/api-types";
 
 const formSchema = z.object({
   name: z.string().trim().min(3),
@@ -26,26 +26,48 @@ const formSchema = z.object({
 
 type FormType = z.infer<typeof formSchema>;
 
-export const RegisterClientDialog = () => {
+interface RegisterClientDialogProps {
+  children?: React.ReactNode;
+  client?: Client;
+}
+
+export const RegisterClientDialog = ({
+  children,
+  client,
+}: RegisterClientDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  const defaultValues = client
+    ? {
+        name: client.name,
+        email: client.email,
+        phone: client.phone,
+      }
+    : {
+        name: "",
+        email: null,
+        phone: null,
+      };
+
   const forms = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: null,
-      phone: null,
-    },
+    defaultValues,
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (body: FormType) => ApiRegisterClient(body),
+    mutationFn: (body: FormType) => {
+      if (client) {
+        return ApiUpdateClient({ id: client.id, ...body });
+      }
+      return ApiRegisterClient(body);
+    },
     onSuccess: async ({ message }) => {
       console.log(message);
       await queryClient.refetchQueries({
         queryKey: ["clients"],
       });
+      setOpen(false);
     },
     onError: (error: ApiError) => {
       console.error(error);
@@ -60,18 +82,23 @@ export const RegisterClientDialog = () => {
   return (
     <Dialog modal open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant={"ghost"}
-          className="flex border-separate items-center justify-start rounded-none 
+        {children ? (
+          children
+        ) : (
+          <Button
+            variant={"ghost"}
+            className="flex border-separate items-center justify-start rounded-none 
           border-b px-3 py-3 text-muted-foreground">
-          <PlusSquare className="mr-2 h-4 w-4" />
-          Create new
-        </Button>
+            <PlusSquare className="mr-2 h-4 w-4" />
+            Create new
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Register client</DialogTitle>
+        <DialogTitle>{client ? "Update" : "Register"} client</DialogTitle>
         <DialogDescription>
-          Register clients that you frequently do payments
+          {client ? "Update" : "Register"} clients that you frequently do
+          payments
         </DialogDescription>
         <Separator />
         <RHFForm methods={forms}>
@@ -85,11 +112,14 @@ export const RegisterClientDialog = () => {
               label="Email"
               name="email"
               iconLeft={() => <Mail className="size-5" />}
+              placeholder="@email.com..."
             />
             <RHFInput<FormType>
               label="Phone"
               name="phone"
+              mask="phone"
               iconLeft={() => <Smartphone className="size-5" />}
+              placeholder="(15) 9999-9999"
             />
             <div className="w-full inline-flex items-center justify-end gap-4">
               <div>
@@ -103,7 +133,7 @@ export const RegisterClientDialog = () => {
                 </Button>
               </div>
               <div>
-                <Button variant="blue">Cadastrar</Button>
+                <Button variant="blue">{client ? "Update" : "Register"}</Button>
               </div>
             </div>
           </form>

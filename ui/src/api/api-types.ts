@@ -170,7 +170,7 @@ export type GetFinancialSummaryResponseType = {
 };
 
 export type GetCategoriesBodyType = {
-  type: CategoryTypes;
+  type: CategoryTypes[];
 };
 
 export type GetCategoriesResponseType = {
@@ -184,6 +184,24 @@ export type RegisterNewCategoryBodyType = {
 };
 
 export type RegisterNewCategoryResponseType = {
+  message: string;
+};
+
+export type UpdateCategoryBodyType = {
+  id: number;
+  name: string;
+  emoji: string;
+  type: CategoryTypes;
+};
+
+export type UpdateCategoryResponseType = {
+  message: string;
+};
+
+export type DeleteCategoryBodyType = {
+  id: number;
+};
+export type DeleteCategoryResponseType = {
   message: string;
 };
 

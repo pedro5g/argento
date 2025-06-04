@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Separator } from "../ui/separator";
-import type { ApiError, CategoryTypes } from "@/api/api-types";
+import type { ApiError, Category, CategoryTypes } from "@/api/api-types";
 import { Button } from "../ui/button";
 import { Bookmark, PlusSquare, Tag } from "lucide-react";
 import { z } from "zod";
@@ -17,7 +17,7 @@ import { RHFInput } from "../rhf/rhf-input";
 import { RHFSelect } from "../rhf/rhf-select";
 import { RHFEmojiPicker } from "../rhf/rhf-emoji-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiRegisterNewCategory } from "@/api/endpoints";
+import { ApiRegisterNewCategory, ApiUpdateCategory } from "@/api/endpoints";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -30,23 +30,42 @@ type FormType = z.infer<typeof formSchema>;
 
 interface CreateCategoryDialogProps {
   type?: CategoryTypes;
+  children?: React.ReactNode;
+  category?: Category;
 }
 
-export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
+export const CreateCategoryDialog = ({
+  type,
+  children,
+  category,
+}: CreateCategoryDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  const defaultValues = category
+    ? {
+        name: category.name,
+        emoji: category.emoji,
+        type: category.type,
+      }
+    : {
+        name: "",
+        emoji: type ? (type === "income" ? "💵" : "😫") : "🤑",
+        type: type ? type : "income",
+      };
+
   const forms = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      emoji: type ? (type === "income" ? "💵" : "😫") : "🤑",
-      type: type ? type : "income",
-    },
+    defaultValues,
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (body: FormType) => ApiRegisterNewCategory(body),
+    mutationFn: (body: FormType) => {
+      if (category) {
+        return ApiUpdateCategory({ id: category.id, ...body });
+      }
+      return ApiRegisterNewCategory(body);
+    },
     onSuccess: async () => {
       await queryClient.refetchQueries({
         queryKey: ["categories"],
@@ -67,16 +86,20 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
   return (
     <Dialog modal open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant={"ghost"}
-          className="flex border-separate items-center justify-start rounded-none 
+        {children ? (
+          children
+        ) : (
+          <Button
+            variant={"ghost"}
+            className="flex border-separate items-center justify-start rounded-none 
           border-b px-3 py-3 text-muted-foreground">
-          <PlusSquare className="mr-2 h-4 w-4" />
-          Create new
-        </Button>
+            <PlusSquare className="mr-2 h-4 w-4" />
+            Create new
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Create category</DialogTitle>
+        <DialogTitle>{category ? "Create" : "Update"} category</DialogTitle>
         <DialogDescription>
           Organize your finances into different categories
         </DialogDescription>
@@ -127,7 +150,7 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
               </div>
               <div>
                 <Button form="crate_category_form" variant="blue">
-                  Cadastrar
+                  {category ? "Update" : "Register"}
                 </Button>
               </div>
             </div>

@@ -14,6 +14,9 @@ export function useSetCurrentAccount() {
       await queryClient.refetchQueries({
         queryKey: ["financial-summary"],
       });
+      await queryClient.refetchQueries({
+        queryKey: ["categories"],
+      });
     },
     onError: async (error) => {
       console.log(error);
