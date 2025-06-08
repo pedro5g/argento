@@ -102,7 +102,12 @@ export const RegisterClientDialog = ({
         </DialogDescription>
         <Separator />
         <RHFForm methods={forms}>
-          <form onSubmit={forms.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={(e) => {
+              e.stopPropagation();
+              forms.handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-6">
             <RHFInput<FormType>
               label="Client name"
               name="name"

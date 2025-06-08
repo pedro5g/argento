@@ -17,6 +17,15 @@ export function useSetCurrentAccount() {
       await queryClient.refetchQueries({
         queryKey: ["categories"],
       });
+      await queryClient.refetchQueries({
+        queryKey: ["clients"],
+      });
+      await queryClient.refetchQueries({
+        queryKey: ["payment-methods"],
+      });
+      await queryClient.refetchQueries({
+        queryKey: ["transactions"],
+      });
     },
     onError: async (error) => {
       console.log(error);

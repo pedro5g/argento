@@ -17,10 +17,9 @@ export function Account() {
 
   return (
     <div className="flex flex-col flex-1">
-      <div></div>
-      <main className="container mx-auto px-6 py-8 ">
+      <main className="container mx-auto px-6 py-8">
         <div className="space-y-8">
-          <div className="space-y-3">
+          <div className="space-y-1">
             <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-50">
               Account Management
             </h1>
@@ -29,7 +28,7 @@ export function Account() {
               methods
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm">
             <Tabs defaultValue="categories" className="w-full">
               <div className="border-b border-gray-200 dark:border-gray-800 px-6">
                 <TabsList className="h-12 bg-transparent p-0 space-x-8">

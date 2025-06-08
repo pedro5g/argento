@@ -139,7 +139,7 @@ export const CreateIncomeTransactionDialog = () => {
   return (
     <Dialog modal open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-100 hover:bg-green-50 text-green-600 px-5 py-4 shadow">
+        <Button className="bg-green-200 hover:bg-green-200/80 text-green-600 px-5 py-4 rounded ring-2 font-semibold shadow">
           New Invoice
         </Button>
       </DialogTrigger>

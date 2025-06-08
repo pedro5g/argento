@@ -44,20 +44,26 @@ export type RecurrenceType = "none" | "daily" | "weekly" | "monthly" | "yearly";
 export type Transaction = {
   id: string;
   title: string;
-  description: string | null;
-  amount: number;
-  date: string;
-  type: CategoryTypes;
-  isScheduled: boolean;
-  scheduledDate: string | null;
-  confirmed: boolean | null;
-  recurrence: RecurrenceType;
+  amount: string;
   account_id: string;
+  account_name: string;
   category_id: number;
+  category_name: string;
+  category_emoji: string;
   client_id: string | null;
+  client_name: string | null;
+  confirmed: number | null;
+  created_at: string;
+  date: string;
+  description: string;
+  is_scheduled: number;
   payment_method_id: number | null;
-  user_id: string | null;
-  created_at: string | Date;
+  payment_method_name: string | null;
+  payment_method_emoji: string | null;
+  recurrence: string;
+  scheduled_date: string | null;
+  type: CategoryTypes;
+  user_id: string;
 };
 
 export interface AccountFinancialSummary {
@@ -274,3 +280,49 @@ export type UpdateClientBodyType = {
 export type DeleteClientBodyType = {
   id: string;
 };
+
+export interface ListPaginatedTransactionsParams {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  is_scheduled?: boolean;
+  confirmed?: boolean;
+  recurrence?: string;
+  date_from?: string;
+  date_to?: string;
+  amount_min?: number;
+  amount_max?: number;
+  category_id?: number;
+  account_id?: string;
+  client_id?: string;
+  payment_method_id?: number;
+  search?: string;
+  order_by?: string;
+  order_direction?: "asc" | "desc";
+}
+
+export interface PaginationInfo {
+  total: number;
+  limit: number;
+  offset: number;
+  current_page: number;
+  has_next: boolean;
+  has_previous: boolean;
+  total_pages: number;
+}
+
+export interface TransactionsSummary {
+  total_transactions: number;
+  total_income: string;
+  total_expense: string;
+  balance: string;
+  confirmed_count: number;
+  pending_count: number;
+  scheduled_count: number;
+}
+
+export interface ListPaginatedTransactionsResponse {
+  data: Transaction[];
+  pagination: PaginationInfo;
+  summary: TransactionsSummary;
+}

@@ -21,8 +21,18 @@ class CategoryRepository {
     }
 
     public function deleteCategory($categoryId) {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM transactions WHERE category_id = ?");
+        $stmt->execute([$categoryId]);
+        $count = $stmt->fetchColumn();
+
+        if ($count > 0) {
+            return ['error' => 'Category cannot be deleted because it is associated with transactions.'];
+        }
+
         $stmt = $this->pdo->prepare("DELETE FROM categories WHERE id = ?");
         $stmt->execute([$categoryId]);
+
+        return ['success' => true];
     }
 
     public function findById($id) {
@@ -32,8 +42,10 @@ class CategoryRepository {
     }
 
     public function listCategories($data) {
-        $stmt = $this->pdo->prepare("SELECT id, name, type, emoji FROM categories WHERE account_id = ? AND type = ?");
-        $stmt->execute([$data['accountId'], $data['type']]);
+        $in  = str_repeat('?,', count($data['type']) - 1) . '?';
+        $stmt = $this->pdo->prepare("SELECT id, name, type, emoji FROM categories WHERE account_id = ? AND type IN ($in)");
+        $params = array_merge([$data['accountId']], $data['type']);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

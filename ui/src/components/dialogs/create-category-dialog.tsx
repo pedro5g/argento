@@ -107,7 +107,10 @@ export const CreateCategoryDialog = ({
         <RHFForm methods={forms}>
           <form
             id="crate_category_form"
-            onSubmit={forms.handleSubmit(onSubmit)}
+            onSubmit={(e) => {
+              e.stopPropagation();
+              forms.handleSubmit(onSubmit)(e);
+            }}
             className="space-y-6">
             <div className="w-full flex flex-col items-center justify-center gap-4">
               <RHFEmojiPicker<FormType> name="emoji" />

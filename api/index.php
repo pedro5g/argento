@@ -140,6 +140,7 @@ $app->patch("/payment-method/:paymentId", [$paymentMethodControllers, "updatePay
     $auth,
     validateBody([
         "name" => ["type" => "string", "min" => "3", "max" => "100"],
+        "emoji" => ["type" => "string", "min" => "3", "max" => "100"],
     ])
 ]);
 $app->delete("/payment-method/:paymentId", [$paymentMethodControllers, "deletePaymentMethod"], [$auth]);
@@ -192,6 +193,13 @@ $app->get("/transaction/graph", [$transactionControllers, "getGraphData"], [$aut
 $app->get('/transaction/pending', [$transactionControllers, 'listPendingTransactions'], [$auth]);
 $app->get('/transaction/pending/simulate', [$transactionControllers, 'simulatePendingImpact'], [$auth]);
 $app->patch('/transaction/pending/:transactionId/confirm', [$transactionControllers, 'confirmScheduledTransaction'], [$auth]);
+$app->get("/transaction/period/:period", [$transactionControllers, "getTransactionsByPeriod"], [$auth]);
+$app->get("/transaction/category/:categoryId", [$transactionControllers, "getTransactionsByCategory"], [$auth]);
+$app->get("/transaction/scheduled", [$transactionControllers, "getScheduledTransactions"], [$auth]);
+$app->get("/transaction/search", [$transactionControllers, "searchTransactions"], [$auth]);
+$app->get("/transaction/recent", [$transactionControllers, "getRecentTransactions"], [$auth]);
+$app->get("/transaction/report", [$transactionControllers, "getTransactionsReport"], [$auth]);
+
 
 
 $app->run();

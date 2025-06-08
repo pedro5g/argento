@@ -141,7 +141,7 @@ export const CreateExpenseTransactionDialog = () => {
   return (
     <Dialog modal open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-red-100 text-red-600 hover:bg-red-200 px-5 py-4 shadow">
+        <Button className="bg-red-200 text-red-600 hover:bg-red-200/80 px-5 rounded ring-2 font-semibold py-4 shadow">
           New Expense
         </Button>
       </DialogTrigger>
@@ -158,6 +158,7 @@ export const CreateExpenseTransactionDialog = () => {
         <Separator />
         <RHFForm methods={forms}>
           <form
+            id="create_expense_form"
             onSubmit={forms.handleSubmit(onSubmit, (error) => {
               console.log("Error on expense form >>>", error);
             })}
@@ -240,7 +241,7 @@ export const CreateExpenseTransactionDialog = () => {
                     </Label>
                     <RHFCategorySelector<FormType>
                       name="categoryId"
-                      categoryType="income"
+                      categoryType="expense"
                     />
                     <p className="text-sm text-gray-500 mt-1">
                       Categorize this transaction for better organization
@@ -341,7 +342,10 @@ export const CreateExpenseTransactionDialog = () => {
                   </Button>
                 </div>
                 <div>
-                  <Button disabled={isPending} variant="blue">
+                  <Button
+                    form="create_expense_form"
+                    disabled={isPending}
+                    variant="blue">
                     {isPending && <Loader2 className="animate-spin" />}
                     Cadastrar
                   </Button>

@@ -10,6 +10,8 @@ import type {
   GetCategoriesResponseType,
   GetFinancialSummaryResponseType,
   ListClientsResponseType,
+  ListPaginatedTransactionsParams,
+  ListPaginatedTransactionsResponse,
   ListUserAccountResponseType,
   LoginBodyType,
   LoginResponseType,
@@ -189,4 +191,13 @@ export const ApiDeleteClient = async <T extends DeleteClientBodyType>({
 
 export const ApiListClients = async () => {
   return await httpClient.GET<ListClientsResponseType>("/client/list");
+};
+
+export const ApiListPaginatedTransactions = async (
+  params?: ListPaginatedTransactionsParams
+) => {
+  return await httpClient.GET<ListPaginatedTransactionsResponse>(
+    "/transaction/paginated",
+    params
+  );
 };

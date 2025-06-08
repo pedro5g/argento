@@ -28,6 +28,7 @@ class PaymentMethodControllers {
             $data = [
               "paymentMethodId" => $req->params['paymentId'],
               "name" => $req->body['name'],
+              "emoji" => $req->body['emoji']
             ]; 
             $this->paymentMethodServices->updatePaymentMethod($data);
             return $res->json(["Message" => "Payment method updated"]);
@@ -45,7 +46,10 @@ class PaymentMethodControllers {
             
             return $res->json(["Message" => "Payment method  deleted"]);
         } catch (Exception $e) {
-            return $res->status(404)->json(["error" => $e->getMessage()]);
+            if($e->getMessage() === 'Payment Method not found'){
+                return $res->status(404)->json(["error" => $e->getMessage()]);
+            }
+            return $res->status(400)->json(["error" => $e->getMessage()]);
         }
     }
 

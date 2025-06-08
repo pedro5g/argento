@@ -29,7 +29,8 @@ class CategoryControllers {
             $data = [
               "categoryId" => $req->params['categoryId'],
               "name" => $req->body['name'],
-              "type" => $req->body['type']
+              "type" => $req->body['type'],
+              "emoji" =>  $req->body['emoji']
             ]; 
             $this->categoryServices->updateCategory($data);
             return $res->json(["Message" => "Category updated"]);
@@ -46,14 +47,17 @@ class CategoryControllers {
             
             return $res->json(["Message" => "Category deleted"]);
         } catch (Exception $e) {
-            return $res->status(404)->json(["error" => $e->getMessage()]);
+            if($e->getMessage() === 'Category not found'){
+                return $res->status(404)->json(["error" => $e->getMessage()]);
+            }
+            return $res->status(400)->json(["error" => $e->getMessage()]);
         }
     }
 
     public function listAllCategories($req, $res){
         try {
             $accountId = $req->account['id'];  
-            $type = $req->query['type'];
+            $type = $req->query['type'] ? explode(',', $req->query['type']) : ["income", "expense"];
             $categories = $this->categoryServices->listCategories([
                 "accountId" => $accountId,
                 "type" =>  $type

@@ -1,5 +1,5 @@
 @baseURL = http://localhost/finance-app/api/index.php/api
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDg5NTIxODUsImV4cCI6MTc0ODk1NTc4NX0.7fnJc_fiQ0QDj4JRIKBRTIskvBBGreCRI83Jxci-sZ4
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDkwNDEwNDEsImV4cCI6MTc0OTA0NDY0MX0.DdlXBgw7Fp8uDHpXzlsUkFmKb-S-hUps7S2WTIGDrd4
 
 
 ### @name listAllUsers
@@ -65,11 +65,12 @@ Authorization: Bearer {{token}}
 
 {
   "name": "Bicos",
-  "type": "income"
+  "type": "income",
+  "emoji": "🤑"
 }
 
 ### @name list_categories
-GET {{baseURL}}/category/list
+GET {{baseURL}}/category/list?type=expense
 Authorization: Bearer {{token}}
 
 ### @name update_category
@@ -213,4 +214,108 @@ Authorization: Bearer {{token}}
 
 ### @name confirm_scheduled_transaction
 PATCH {{baseURL}}/transaction/pending/3/confirm
+Authorization: Bearer {{token}}
+
+#########
+
+### @name list_transactions_paginated
+GET {{baseURL}}/transaction/paginated?limit=10&offset=0
+Authorization: Bearer {{token}}
+
+### @name list_transactions_paginated_with_filters
+GET {{baseURL}}/transaction/paginated?limit=20&offset=0&type=expense&date_from=2024-01-01&date_to=2024-12-31&order_by=amount&order_direction=DESC
+Authorization: Bearer {{token}}
+
+### @name list_transactions_by_category
+GET {{baseURL}}/transaction/paginated?category_id=1,2,3&limit=15
+Authorization: Bearer {{token}}
+
+### @name list_transactions_with_search
+GET {{baseURL}}/transaction/paginated?search=mercado&amount_min=50&amount_max=500
+Authorization: Bearer {{token}}
+
+### @name get_transactions_by_period_this_month
+GET {{baseURL}}/transaction/period/this_month?limit=50
+Authorization: Bearer {{token}}
+
+### @name get_transactions_by_period_today
+GET {{baseURL}}/transaction/period/today
+Authorization: Bearer {{token}}
+
+### @name get_transactions_by_period_this_week
+GET {{baseURL}}/transaction/period/this_week?type=income
+Authorization: Bearer {{token}}
+
+### @name get_transactions_by_period_last_month
+GET {{baseURL}}/transaction/period/last_month?order_by=date&order_direction=ASC
+Authorization: Bearer {{token}}
+
+### @name get_transactions_by_category
+GET {{baseURL}}/transaction/category/1?limit=10&offset=0
+Authorization: Bearer {{token}}
+
+### @name get_scheduled_transactions
+GET {{baseURL}}/transaction/scheduled?limit=20
+Authorization: Bearer {{token}}
+
+### @name get_pending_transactions
+GET {{baseURL}}/transaction/pending?limit=10
+Authorization: Bearer {{token}}
+
+### @name search_transactions
+GET {{baseURL}}/transaction/search?search=supermercado&limit=15
+Authorization: Bearer {{token}}
+
+### @name search_transactions_with_filters
+GET {{baseURL}}/transaction/search?search=gasolina&type=expense&date_from=2024-01-01&category_id=5
+Authorization: Bearer {{token}}
+
+### @name get_recent_transactions
+GET {{baseURL}}/transaction/recent?limit=5
+Authorization: Bearer {{token}}
+
+### @name get_transactions_report
+GET {{baseURL}}/transaction/report?date_from=2024-01-01&date_to=2024-12-31&limit=1000
+Authorization: Bearer {{token}}
+
+### @name get_transactions_report_by_category
+GET {{baseURL}}/transaction/report?category_id=1,2,3&type=expense
+Authorization: Bearer {{token}}
+
+### @name get_graph_data
+GET {{baseURL}}/transaction/graph?period=this_year&type=expense
+Authorization: Bearer {{token}}
+
+### @name simulate_pending_impact
+GET {{baseURL}}/transaction/pending/simulate
+Authorization: Bearer {{token}}
+
+### @name get_transaction_by_id
+GET {{baseURL}}/transactions/123
+Authorization: Bearer {{token}}
+
+### @name confirm_scheduled_transaction
+PATCH {{baseURL}}/transaction/pending/456/confirm
+Authorization: Bearer {{token}}
+
+### @name list_all_transactions
+GET {{baseURL}}/transaction/list
+Authorization: Bearer {{token}}
+
+### Exemplos de filtros complexos
+
+### @name complex_filter_income_this_year
+GET {{baseURL}}/transaction/paginated?type=income&date_from=2024-01-01&date_to=2024-12-31&amount_min=1000&order_by=amount&order_direction=DESC&limit=25
+Authorization: Bearer {{token}}
+
+### @name complex_filter_scheduled_expenses
+GET {{baseURL}}/transaction/paginated?type=expense&is_scheduled=true&confirmed=false&recurrence=monthly&limit=10
+Authorization: Bearer {{token}}
+
+### @name complex_filter_multiple_categories
+GET {{baseURL}}/transaction/paginated?category_id=1,2,3,4&account_id=1&date_from=2024-06-01&limit=30&offset=0
+Authorization: Bearer {{token}}
+
+### @name filter_by_payment_method
+GET {{baseURL}}/transaction/paginated?payment_method_id=2&type=expense&amount_max=200&limit=20
 Authorization: Bearer {{token}}

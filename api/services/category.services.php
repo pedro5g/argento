@@ -27,7 +27,8 @@ class CategoryServices {
         }
         $this->categoryRepository->updateCategory($data['categoryId'], [
             "name" => $data['name'],
-            "type" => $data['type']
+            "type" => $data['type'],
+            "emoji" => $data['emoji']
         ]);
     }
 
@@ -35,7 +36,11 @@ class CategoryServices {
         if(!$this->categoryRepository->findById($data['categoryId'])){
             throw new Exception("Category not found");
         }
-        $this->categoryRepository->deleteCategory($data['categoryId']);
+       $result = $this->categoryRepository->deleteCategory($data['categoryId']);
+
+       if(isset($result['error'])) {
+        throw new Exception($result['error']);
+       }
     }
 
 

@@ -21,11 +21,19 @@ class PaymentMethodRepository {
     }
     
     public function updatePaymentMethod($paymentMethodId, $data) {
-        $stmt = $this->pdo->prepare("UPDATE payment_methods SET name = ? WHERE id = ?");
-        $stmt->execute([$data['name'], $paymentMethodId]);
+        $stmt = $this->pdo->prepare("UPDATE payment_methods SET name = ?, emoji = ? WHERE id = ?");
+        $stmt->execute([$data['name'], $data['emoji'], $paymentMethodId]);
     }
 
     public function deletePaymentMethod($paymentMethodId) {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM transactions WHERE payment_method_id = ?");
+        $stmt->execute([$paymentMethodId]);
+        $count = $stmt->fetchColumn();
+
+        if ($count > 0) {
+            return ['error' => 'Payment method cannot be deleted because it is associated with transactions.'];
+        }
+
         $stmt = $this->pdo->prepare("DELETE FROM payment_methods WHERE id = ?");
         $stmt->execute([$paymentMethodId]);
     }

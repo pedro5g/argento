@@ -149,28 +149,168 @@ class TransactionRepository {
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 
-    public function listTransactionsPaginated($userId, $limit = 10, $offset = 0) {
-        $stmt = $this->pdo->prepare("SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC LIMIT ? OFFSET ?");
-        $stmt->bindValue(1, $userId);
-        $stmt->bindValue(2, (int) $limit, PDO::PARAM_INT);
-        $stmt->bindValue(3, (int) $offset, PDO::PARAM_INT);
-        $stmt->execute();
+    public function listTransactionsPaginated($userId, $options = []) {
+        $limit = (int)($options['limit'] ?? 10);
+        $offset = (int)($options['offset'] ?? 0);
+        
+        
+        $limit = max(1, min(1000, $limit)); 
+        $offset = max(0, $offset);
+        
+        $filters = [];
+        $params = [$userId];
+        
+        $sql = "
+            SELECT 
+                t.*,
+                a.name as account_name,
+                c.name as category_name,
+                c.emoji as category_emoji,
+                cl.name as client_name,
+                pm.name as payment_method_name,
+                pm.emoji as payment_method_emoji
+            FROM transactions t
+            LEFT JOIN accounts a ON t.account_id = a.id
+            LEFT JOIN categories c ON t.category_id = c.id
+            LEFT JOIN clients cl ON t.client_id = cl.id
+            LEFT JOIN payment_methods pm ON t.payment_method_id = pm.id
+            WHERE t.user_id = ?
+        ";
+        
+        if (!empty($options['type'])) {
+            $filters[] = "t.type = ?";
+            $params[] = $options['type'];
+        }
+        
+        if (!empty($options['category_id'])) {
+            if (is_array($options['category_id'])) {
+                $placeholders = str_repeat('?,', count($options['category_id']) - 1) . '?';
+                $filters[] = "t.category_id IN ($placeholders)";
+                $params = array_merge($params, $options['category_id']);
+            } else {
+                $filters[] = "t.category_id = ?";
+                $params[] = $options['category_id'];
+            }
+        }
+        
+        if (!empty($options['account_id'])) {
+            if (is_array($options['account_id'])) {
+                $placeholders = str_repeat('?,', count($options['account_id']) - 1) . '?';
+                $filters[] = "t.account_id IN ($placeholders)";
+                $params = array_merge($params, $options['account_id']);
+            } else {
+                $filters[] = "t.account_id = ?";
+                $params[] = $options['account_id'];
+            }
+        }
+        
+        if (!empty($options['client_id'])) {
+            $filters[] = "t.client_id = ?";
+            $params[] = $options['client_id'];
+        }
+        
+        if (!empty($options['payment_method_id'])) {
+            $filters[] = "t.payment_method_id = ?";
+            $params[] = $options['payment_method_id'];
+        }
+        
+        if (!empty($options['date_from'])) {
+            $filters[] = "t.date >= ?";
+            $params[] = $options['date_from'];
+        }
+        
+        if (!empty($options['date_to'])) {
+            $filters[] = "t.date <= ?";
+            $params[] = $options['date_to'];
+        }
+        
+        if (!empty($options['month']) && !empty($options['year'])) {
+            $filters[] = "MONTH(t.date) = ? AND YEAR(t.date) = ?";
+            $params[] = $options['month'];
+            $params[] = $options['year'];
+        }
+        
+        if (!empty($options['amount_min'])) {
+            $filters[] = "t.amount >= ?";
+            $params[] = $options['amount_min'];
+        }
+        
+        if (!empty($options['amount_max'])) {
+            $filters[] = "t.amount <= ?";
+            $params[] = $options['amount_max'];
+        }
+        
+        if (isset($options['confirmed'])) {
+            if ($options['confirmed'] === 'pending') {
+                $filters[] = "t.confirmed IS NULL";
+            } else {
+                $filters[] = "t.confirmed = ?";
+                $params[] = (bool) $options['confirmed'];
+            }
+        }
+        
+        if (isset($options['is_scheduled'])) {
+            $filters[] = "t.is_scheduled = ?";
+            $params[] = (bool) $options['is_scheduled'];
+        }
+        
+        if (!empty($options['recurrence'])) {
+            if (is_array($options['recurrence'])) {
+                $placeholders = str_repeat('?,', count($options['recurrence']) - 1) . '?';
+                $filters[] = "t.recurrence IN ($placeholders)";
+                $params = array_merge($params, $options['recurrence']);
+            } else {
+                $filters[] = "t.recurrence = ?";
+                $params[] = $options['recurrence'];
+            }
+        }
+        
+        if (!empty($options['search'])) {
+            $filters[] = "(t.title LIKE ? OR t.description LIKE ?)";
+            $searchTerm = '%' . $options['search'] . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        if (!empty($filters)) {
+            $sql .= " AND " . implode(" AND ", $filters);
+        }
+        
+        $orderBy = $options['order_by'] ?? 'date';
+        $orderDirection = strtoupper($options['order_direction'] ?? 'DESC');
+        
+        $allowedOrderBy = ['date', 'amount', 'title', 'created_at', 'type'];
+        if (!in_array($orderBy, $allowedOrderBy)) {
+            $orderBy = 'date';
+        }
+        
+        if (!in_array($orderDirection, ['ASC', 'DESC'])) {
+            $orderDirection = 'DESC';
+        }
+        
+        $sql .= " ORDER BY t.$orderBy $orderDirection";
+        
+        $sql .= " LIMIT $limit OFFSET $offset";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDailySummary($userId) {
+    public function getDailySummary($accountId) {
         $stmt = $this->pdo->prepare("
             SELECT 
                 date,
                 SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS total_income,
                 SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS total_expense
             FROM transactions
-            WHERE user_id = ?
+            WHERE account_id = ?
             GROUP BY date
             ORDER BY date ASC
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$accountId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -236,6 +376,69 @@ class TransactionRepository {
         ");
         $stmt->execute([$transactionId]);
     }
+
+    public function countTransactions($userId, $options = []) {
+        $filters = [];
+        $params = [$userId];
+        
+        $sql = "
+            SELECT COUNT(*) as total
+            FROM transactions t
+            WHERE t.user_id = ?
+        ";
+        
+        if (!empty($options['type'])) {
+            $filters[] = "t.type = ?";
+            $params[] = $options['type'];
+        }
+        
+        if (!empty($options['category_id'])) {
+            if (is_array($options['category_id'])) {
+                $placeholders = str_repeat('?,', count($options['category_id']) - 1) . '?';
+                $filters[] = "t.category_id IN ($placeholders)";
+                $params = array_merge($params, $options['category_id']);
+            } else {
+                $filters[] = "t.category_id = ?";
+                $params[] = $options['category_id'];
+            }
+        }
+        
+        
+        if (!empty($filters)) {
+            $sql .= " AND " . implode(" AND ", $filters);
+        }
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }   
+
+
+    public function getTransactionsSummary($userId, $options = []) {
+        $filters = [];
+        
+        $sql = "
+            SELECT 
+                COUNT(*) as total_transactions,
+                SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
+                SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense,
+                SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) as balance,
+                COUNT(CASE WHEN confirmed = 1 THEN 1 END) as confirmed_count,
+                COUNT(CASE WHEN confirmed IS NULL THEN 1 END) as pending_count,
+                COUNT(CASE WHEN is_scheduled = 1 THEN 1 END) as scheduled_count
+            FROM transactions t
+            WHERE t.account_id = ?
+        ";
+        
+        if (!empty($filters)) {
+            $sql .= " AND " . implode(" AND ", $filters);
+        }
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$options['account_id']]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
     
 }
 

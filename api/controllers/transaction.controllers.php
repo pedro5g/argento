@@ -66,15 +66,110 @@ class TransactionControllers {
     public function listPaginatedTransactions($req, $res) {
         try {
             $userId = $req->user['id'];
-            $limit = $req->query['limit'] ?? 10;
-            $offset = $req->query['offset'] ?? 0;
-
-            $transactions = $this->transactionServices->listPaginatedTransactions($userId, $limit, $offset);
-            return $res->json(["transactions" => $transactions]);
+            
+            $options = [
+                'account_id' => $req->account['id'],
+                'limit' => $req->query['limit'] ?? 10,
+                'offset' => $req->query['offset'] ?? 0,
+                'type' => $req->query['type'] ?? null,
+                'is_scheduled' => isset($req->query['is_scheduled']) ? $req->query['is_scheduled'] : null,
+                'confirmed' => isset($req->query['confirmed']) ? $req->query['confirmed'] : null,
+                'recurrence' => $req->query['recurrence'] ?? null,
+                'date_from' => $req->query['date_from'] ?? null,
+                'date_to' => $req->query['date_to'] ?? null,
+                'amount_min' => $req->query['amount_min'] ?? null,
+                'amount_max' => $req->query['amount_max'] ?? null,
+                'category_id' => $req->query['category_id'] ?? null,
+                'client_id' => $req->query['client_id'] ?? null,
+                'payment_method_id' => $req->query['payment_method_id'] ?? null,
+                'search' => $req->query['search'] ?? null,
+                'order_by' => $req->query['order_by'] ?? null,
+                'order_direction' => $req->query['order_direction'] ?? null,
+            ];
+            
+           
+            $options = array_filter($options, function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            $result = $this->transactionServices->listPaginatedTransactions($userId, $options);
+            
+            return $res->json($result);
+            
         } catch (Exception $e) {
             return $res->status(400)->json(["error" => $e->getMessage()]);
         }
     }
+
+    public function getTransactionsByPeriod($req, $res) {
+        try {
+            $userId = $req->user['id'];
+            $period = $req->params['period'] ?? 'this_month';
+            
+            
+            $options = array_filter([
+                'limit' => $req->query['limit'] ?? null,
+                'offset' => $req->query['offset'] ?? null,
+                'type' => $req->query['type'] ?? null,
+                'order_by' => $req->query['order_by'] ?? null,
+                'order_direction' => $req->query['order_direction'] ?? null,
+            ], function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            $result = $this->transactionServices->getTransactionsByPeriod($userId, $period, $options);
+            
+            return $res->json($result);
+            
+        } catch (Exception $e) {
+            return $res->status(400)->json(["error" => $e->getMessage()]);
+        }
+    }
+    
+    public function searchTransactions($req, $res) {
+        try {
+            $userId = $req->user['id'];
+            $searchTerm = $req->query['search'] ?? '';
+            
+            if (empty(trim($searchTerm))) {
+                return $res->status(400)->json(["error" => "Search term is required"]);
+            }
+            
+            $options = array_filter([
+                'limit' => $req->query['limit'] ?? null,
+                'offset' => $req->query['offset'] ?? null,
+                'type' => $req->query['type'] ?? null,
+                'category_id' => $req->query['category_id'] ?? null,
+                'date_from' => $req->query['date_from'] ?? null,
+                'date_to' => $req->query['date_to'] ?? null,
+            ], function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            $result = $this->transactionServices->searchTransactions($userId, $searchTerm, $options);
+            
+            return $res->json($result);
+            
+        } catch (Exception $e) {
+            return $res->status(400)->json(["error" => $e->getMessage()]);
+        }
+    }
+    
+    public function getRecentTransactions($req, $res) {
+        try {
+            $userId = $req->user['id'];
+            $limit = $req->query['limit'] ?? 5;
+            
+            $transactions = $this->transactionServices->getRecentTransactions($userId, $limit);
+            
+            return $res->json(["transactions" => $transactions]);
+            
+        } catch (Exception $e) {
+            return $res->status(400)->json(["error" => $e->getMessage()]);
+        }
+    }
+
+
 
     public function getGraphData($req, $res) {
         try {

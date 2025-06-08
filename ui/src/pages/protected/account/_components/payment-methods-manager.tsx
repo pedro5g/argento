@@ -1,6 +1,7 @@
 import { useListPaymentMethods } from "@/api/hooks/use-list-payment-methods";
 import { CreatePaymentMethodDialog } from "@/components/dialogs/create-payment-method-dialog";
 import { DeletePaymentMethodAlert } from "@/components/dialogs/delete-payment-method-alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -61,11 +62,15 @@ export const PaymentMethodsManager = () => {
         {filteredPaymentMethods.map((method) => (
           <Card
             key={method.id}
-            className="group bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 hover:shadow-md">
-            <CardContent className="px-2 py-1">
+            className="group py-2 px-0 rounded-md border transition-all duration-200">
+            <CardContent className="px-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="text-2xl">{method.emoji}</div>
+                  <Avatar className="h-10 w-10 bg-zinc-50">
+                    <AvatarFallback className="bg-transparent text-lg">
+                      {method.emoji}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-gray-50">
                       {method.name}

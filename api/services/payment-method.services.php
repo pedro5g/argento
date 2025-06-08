@@ -25,14 +25,19 @@ class PaymentMethodServices {
         }
         $this->paymentMethodRepository->updatePaymentMethod($data['paymentMethodId'], [
             "name" => $data['name'],
+            "emoji" => $data['emoji'],
         ]);
     }
 
     public function deletePaymentMethod($data) {
         if(!$this->paymentMethodRepository->findById($data['paymentMethodId'])){
-            throw new Exception("payment Method not found");
+            throw new Exception("Payment Method not found");
         }
-        $this->paymentMethodRepository->deletePaymentMethod($data['paymentMethodId']);
+        $result = $this->paymentMethodRepository->deletePaymentMethod($data['paymentMethodId']);
+        
+        if(isset($result['error'])) {
+            throw new Exception($result['error']);
+        }
     }
 
 

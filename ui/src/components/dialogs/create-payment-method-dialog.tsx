@@ -101,7 +101,12 @@ export const CreatePaymentMethodDialog = ({
         </DialogDescription>
         <Separator />
         <RHFForm methods={forms}>
-          <form onSubmit={forms.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={(e) => {
+              e.stopPropagation();
+              forms.handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-6">
             <div className="w-full flex flex-col items-center justify-center gap-4">
               <RHFEmojiPicker<FormType> name="emoji" />
               <p className="text-zinc-400 text-xs mr-auto">

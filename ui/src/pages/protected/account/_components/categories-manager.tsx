@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateCategoryDialog } from "@/components/dialogs/create-category-dialog";
 import { DeleteCategoryAlert } from "@/components/dialogs/delete-category-alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const CategoriesManager = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,7 +57,7 @@ export const CategoriesManager = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center flex-1">
         <div className="relative flex-1 max-w-sm">
           <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -98,7 +99,7 @@ export const CategoriesManager = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
         {isPending || !categories ? (
           [...Array.from({ length: 8 })].map((_, i) => (
             <Skeleton
@@ -110,21 +111,25 @@ export const CategoriesManager = () => {
           filteredCategories.map((category) => (
             <Card
               key={category.id}
-              className="group bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 hover:shadow-md">
-              <CardContent className="px-2 py-1">
-                <div className="flex items-start justify-between">
+              className="group p-0 rounded-md border transition-all duration-200">
+              <CardContent className="p-0">
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between p-2 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="text-2xl">{category.emoji}</div>
-                    <div className="space-y-1">
-                      <h3 className="font-medium text-gray-900 dark:text-gray-50">
-                        {category.name}
-                      </h3>
+                    <Avatar className="h-10 w-10 bg-zinc-50">
+                      <AvatarFallback className="bg-transparent text-lg">
+                        {category.emoji}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-sm">{category.name}</p>
                       <Badge
                         variant="outline"
                         className={`text-xs ${
                           category.type === "income"
-                            ? "text-green-700 border-green-300 bg-green-50 dark:text-green-400 dark:border-green-600 dark:bg-green-900/20"
-                            : "text-red-700 border-red-300 bg-red-50 dark:text-red-400 dark:border-red-600 dark:bg-red-900/20"
+                            ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300"
+                            : "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300"
                         }`}>
                         {category.type}
                       </Badge>
@@ -167,7 +172,7 @@ export const CategoriesManager = () => {
           ))
         ) : (
           <div className="col-span-full py-10 bg-zinc-50">
-            <div className="flex flex-col gap-2 flex-1 items-center justify-center">
+            <div className="flex flex-col gap-2  items-center justify-center">
               <p className="text-2xl text-zinc-600">No categories found :(</p>
               <span className="font-semibold">
                 Tip: create{" "}

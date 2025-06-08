@@ -6,6 +6,7 @@ import { SignIn } from "./pages/publics/sign-in";
 import { AppLayout } from "./layouts/app-layout";
 import { Dashboard } from "./pages/protected/dashboard";
 import { Account } from "./pages/protected/account";
+import { Transactions } from "./pages/protected/transactions";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
         children: [
           { path: "/dashboard", element: <Dashboard /> },
           { path: "/account", element: <Account /> },
+          { path: "/transactions", element: <Transactions /> },
         ],
       },
     ],
