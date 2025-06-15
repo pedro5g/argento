@@ -9,6 +9,7 @@ require_once './repositories/category.repository.php';
 require_once './repositories/payment-method.repository.php';
 require_once './repositories/client.repository.php';
 require_once './repositories/transaction.repository.php';
+require_once './repositories/history.repository.php';
 
 require_once './services/auth.services.php';
 require_once './services/user.services.php';
@@ -17,6 +18,7 @@ require_once './services/category.services.php';
 require_once './services/payment-method.services.php';
 require_once './services/client.services.php';
 require_once './services/transaction.services.php';
+require_once './services/history.services.php';
 
 require_once './controllers/auth.controllers.php';
 require_once './controllers/user.controllers.php';
@@ -25,6 +27,7 @@ require_once './controllers/category.controllers.php';
 require_once './controllers/payment-method.controllers.php';
 require_once './controllers/client.controllers.php';
 require_once './controllers/transaction.controllers.php';
+require_once './controllers/history.controllers.php';
 
 require_once './middlewares/validate-body.middleware.php';
 require_once './middlewares/auth.middleware.php';
@@ -55,6 +58,7 @@ $categoryRepository = new CategoryRepository($conn);
 $paymentMethodRepository = new PaymentMethodRepository($conn);
 $clientRepository = new ClientRepository($conn);
 $transactionRepository = new TransactionRepository($conn);
+$historyRepository = new HistoryRepository($conn);
 
 ## Services
 $authServices = new AuthServices($authRepository, 'jwt_secret');
@@ -64,6 +68,7 @@ $categoryServices = new CategoryServices($categoryRepository);
 $paymentMethodServices = new PaymentMethodServices($paymentMethodRepository);
 $clientServices = new ClientServices($clientRepository);
 $transactionServices = new TransactionServices($transactionRepository);
+$historyServices = new HistoryServices($historyRepository);
 
 ## Controllers
 $authControllers = new AuthControllers($authServices);
@@ -73,6 +78,7 @@ $categoryControllers = new CategoryControllers($categoryServices);
 $paymentMethodControllers = new PaymentMethodControllers($paymentMethodServices);
 $clientControllers = new ClientControllers($clientServices);
 $transactionControllers = new TransactionControllers($transactionServices);
+$historyControllers = new HistoryControllers($historyServices);
 
 
 $app = new Sedex();
@@ -200,6 +206,13 @@ $app->get("/transaction/search", [$transactionControllers, "searchTransactions"]
 $app->get("/transaction/recent", [$transactionControllers, "getRecentTransactions"], [$auth]);
 $app->get("/transaction/report", [$transactionControllers, "getTransactionsReport"], [$auth]);
 
+// history routes
+$app->get("/history/pdf", [$historyControllers, "getHistoryForPDF"], [$auth]);
+$app->get("/history/chart", [$historyControllers, "getHistoryForChart"], [$auth]);
+$app->get("/history/summary", [$historyControllers, "getHistorySummary"], [$auth]);
+$app->get("/history/dashboard", [$historyControllers, "getDashboardData"], [$auth]);
+$app->get("/history/chart/period/:period", [$historyControllers, "getChartByPeriod"], [$auth]);
+$app->get("/history/export/pdf", [$historyControllers, "exportPDF"], [$auth]);
 
 
 $app->run();

@@ -1,5 +1,5 @@
 @baseURL = http://localhost/finance-app/api/index.php/api
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NDkwNDEwNDEsImV4cCI6MTc0OTA0NDY0MX0.DdlXBgw7Fp8uDHpXzlsUkFmKb-S-hUps7S2WTIGDrd4
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NTAwMDM3MDQsImV4cCI6MTc1MDAwNzMwNH0.UTKUwWKxWGXBRghTP7gNEfDhVFFBs-BqeEEdkmbzDiQ
 
 
 ### @name listAllUsers
@@ -318,4 +318,9 @@ Authorization: Bearer {{token}}
 
 ### @name filter_by_payment_method
 GET {{baseURL}}/transaction/paginated?payment_method_id=2&type=expense&amount_max=200&limit=20
+Authorization: Bearer {{token}}
+
+
+### @name get_history_for_FDP
+GET {{baseURL}}/history/pdf
 Authorization: Bearer {{token}}

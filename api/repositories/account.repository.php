@@ -75,7 +75,6 @@ class AccountRepository {
         if ($result) {
             
             $result['projectedBalance'] = $result['current_balance'] + $result['pending_net_balance'];
-            
             $result['totalTransactions'] = $result['confirmed_income_count'] + $result['confirmed_expenses_count'] + 
                                            $result['pending_income_count'] + $result['pending_expenses_count'];
             $result['totalConfirmedTransactions'] = $result['confirmed_income_count'] + $result['confirmed_expenses_count'];

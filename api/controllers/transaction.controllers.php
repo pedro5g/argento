@@ -34,7 +34,6 @@ class TransactionControllers {
         try {
             $data = [
                 'id' => $req->params['transactionId'],
-                'user_id' => $req->user['id']
             ];
             $this->transactionServices->deleteTransaction($data);
             return $res->json(["message" => "Transaction deleted"]);

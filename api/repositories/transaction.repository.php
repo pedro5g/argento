@@ -124,15 +124,17 @@ class TransactionRepository {
         }
     }
 
-    public function delete($id, $userId) {
+    public function delete($id) {
        try {
            $this->pdo->beginTransaction();
            $transaction = $this->findById($id);
            $stmt = $this->pdo->prepare("DELETE FROM transactions WHERE id = ?");
            $stmt->execute([$id]);
-        
+
            $this->updateAccountBalance($transaction['account_id'], $transaction['amount'], $transaction['type'] === 'income' ? 'expense' : 'income');
-       } catch (Exception $e) {
+           $this->pdo->commit();
+
+        } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
        }
@@ -379,12 +381,12 @@ class TransactionRepository {
 
     public function countTransactions($userId, $options = []) {
         $filters = [];
-        $params = [$userId];
+        $params = [$options['account_id']];
         
         $sql = "
             SELECT COUNT(*) as total
             FROM transactions t
-            WHERE t.user_id = ?
+            WHERE t.account_id = ?
         ";
         
         if (!empty($options['type'])) {

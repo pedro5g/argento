@@ -84,4 +84,7 @@ CREATE TABLE history (
     total_expense DECIMAL(10, 2) DEFAULT 0,
     net_balance DECIMAL(10, 2) GENERATED ALWAYS AS (total_income - total_expense) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    account_id VARCHAR(36) NOT NULL,
+
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL
 );

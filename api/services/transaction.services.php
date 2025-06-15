@@ -25,7 +25,7 @@ class TransactionServices {
             throw new Exception("Transaction not found");
         }
 
-        return $this->transactionRepository->delete($data['id'], $data['user_id']);
+        return $this->transactionRepository->delete($data['id']);
     }
 
     public function getTransactionById($id) {
@@ -85,7 +85,7 @@ class TransactionServices {
 
     public function getPendingTransactions($userId, $options = []) {
         $options['is_scheduled'] = true;
-        $options['confirmed'] = false; 
+        $options['confirmed'] = false;
         
         return $this->listPaginatedTransactions($userId, $options);
     }
