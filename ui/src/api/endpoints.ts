@@ -1,14 +1,21 @@
 import type {
   ClientBaseResponseType,
+  ConfirmScheduledTransactionBodyType,
   CreatePaymentMethodBodyType,
   CreatePaymentMethodResponseType,
   DeleteCategoryBodyType,
   DeleteCategoryResponseType,
   DeleteClientBodyType,
   DeletePaymentMethodBodyType,
+  DeleteTransactionBodyType,
+  FinancialExportResponse,
+  FinancialHistoryChartBodyType,
+  FinancialHistoryChartResponseType,
+  FinancialSummaryResponseType,
   GetCategoriesBodyType,
   GetCategoriesResponseType,
   GetFinancialSummaryResponseType,
+  GraphTransactionResponseType,
   ListClientsResponseType,
   ListPaginatedTransactionsParams,
   ListPaginatedTransactionsResponse,
@@ -27,6 +34,7 @@ import type {
   RegisterTransactionResponseType,
   SetCurrentAccountBodyType,
   SetCurrentAccountResponseType,
+  TransactionResponseType,
   UpdateCategoryBodyType,
   UpdateClientBodyType,
   UpdatePaymentMethodBodyType,
@@ -199,5 +207,45 @@ export const ApiListPaginatedTransactions = async (
   return await httpClient.GET<ListPaginatedTransactionsResponse>(
     "/transaction/paginated",
     params
+  );
+};
+
+export const ApiDeleteTransaction = async ({
+  transactionId,
+}: DeleteTransactionBodyType) => {
+  return await httpClient.DELETE<TransactionResponseType>(
+    `/transactions/${transactionId}`
+  );
+};
+
+export const ApiConfirmScheduledTransaction = async ({
+  transactionId,
+}: ConfirmScheduledTransactionBodyType) => {
+  return await httpClient.PATCH<TransactionResponseType>(
+    `/transaction/pending/${transactionId}/confirm`
+  );
+};
+
+export const ApiHistoryForPDF = async () => {
+  return await httpClient.GET<FinancialSummaryResponseType>("/history/pdf");
+};
+
+export const ApiExportForPDF = async () => {
+  return await httpClient.GET<FinancialExportResponse>("/history/export/pdf");
+};
+
+export const ApiFinancialHistoryChat = async <
+  B extends FinancialHistoryChartBodyType
+>({
+  period = "current_month",
+}: B) => {
+  return await httpClient.GET<FinancialHistoryChartResponseType>(
+    `/history/chart/period/${period}`
+  );
+};
+
+export const ApiGraphTransaction = async () => {
+  return await httpClient.GET<GraphTransactionResponseType>(
+    "/transaction/graph"
   );
 };

@@ -8,10 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   PlusIcon,
-  SearchIcon,
   MoreHorizontalIcon,
   EditIcon,
   TrashIcon,
@@ -24,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CreateCategoryDialog } from "@/components/dialogs/create-category-dialog";
 import { DeleteCategoryAlert } from "@/components/dialogs/delete-category-alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SearchInput } from "@/components/search-input";
 
 export const CategoriesManager = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,16 +57,10 @@ export const CategoriesManager = () => {
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center flex-1">
-        <div className="relative flex-1 max-w-sm">
-          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search categories..."
-            className="pl-9 border-0 bg-muted/50"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
+        <SearchInput
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
         <div className="flex gap-2">
           <Badge
             variant={typeFilter === "all" ? "default" : "outline"}

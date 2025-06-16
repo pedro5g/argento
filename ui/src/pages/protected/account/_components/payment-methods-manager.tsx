@@ -1,6 +1,7 @@
 import { useListPaymentMethods } from "@/api/hooks/use-list-payment-methods";
 import { CreatePaymentMethodDialog } from "@/components/dialogs/create-payment-method-dialog";
 import { DeletePaymentMethodAlert } from "@/components/dialogs/delete-payment-method-alert";
+import { SearchInput } from "@/components/search-input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,12 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   EditIcon,
   MoreHorizontalIcon,
   PlusIcon,
-  SearchIcon,
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -48,15 +47,7 @@ export const PaymentMethodsManager = () => {
         </div>
       </div>
 
-      <div className="relative max-w-sm">
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search payment methods..."
-          className="pl-9 border-0 bg-muted/50"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredPaymentMethods.map((method) => (

@@ -1,4 +1,3 @@
-// import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import type { Transaction } from "@/api/api-types";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,11 +13,11 @@ import {
   Eye,
   Copy,
   CheckCircle,
-  XCircle,
-  Calendar,
   FileText,
   Ellipsis,
 } from "lucide-react";
+import { DeleteTransactionAlert } from "../dialog/delete-transaction-alert";
+import { ConfirmTransactionScheduledAlert } from "../dialog/confirm-transaction-scheduled-alert";
 
 interface RowActionsProps {
   transaction: Transaction;
@@ -43,15 +42,15 @@ export const RowActions = ({ transaction }: RowActionsProps) => {
     // });
   };
 
-  const handleDelete = () => {
-    // Implementar exclusão da transação
-    console.log("Excluir transação:", transaction.id);
-    // toast({
-    //   title: "Excluir transação",
-    //   description: `Excluindo transação: ${transaction.title}`,
-    //   variant: "destructive",
-    // });
-  };
+  // const handleDelete = () => {
+  //   // Implementar exclusão da transação
+  //   console.log("Excluir transação:", transaction.id);
+  //   // toast({
+  //   //   title: "Excluir transação",
+  //   //   description: `Excluindo transação: ${transaction.title}`,
+  //   //   variant: "destructive",
+  //   // });
+  // };
 
   const handleCopy = () => {
     // Copiar ID da transação
@@ -62,36 +61,12 @@ export const RowActions = ({ transaction }: RowActionsProps) => {
     // });
   };
 
-  const handleToggleConfirmed = () => {
-    // Implementar alternar status de confirmação
-    const newStatus = transaction.confirmed === 1 ? "pendente" : "confirmada";
-    console.log(`Marcar transação como ${newStatus}:`, transaction.id);
-    // toast({
-    //   title: "Status alterado",
-    //   description: `Transação marcada como ${newStatus}`,
-    // });
-  };
-
-  const handleSchedule = () => {
-    // Implementar agendamento da transação
-    console.log("Agendar transação:", transaction.id);
-    // toast({
-    //   title: "Agendar transação",
-    //   description: `Agendando transação: ${transaction.title}`,
-    // });
-  };
-
   const handleDuplicate = () => {
     // Implementar duplicação da transação
     console.log("Duplicar transação:", transaction.id);
-    // toast({
-    //   title: "Duplicar transação",
-    //   description: `Duplicando transação: ${transaction.title}`,
-    // });
   };
 
   const isConfirmed = transaction.confirmed === 1;
-  const isScheduled = transaction.is_scheduled === 1;
 
   return (
     <DropdownMenu>
@@ -100,63 +75,53 @@ export const RowActions = ({ transaction }: RowActionsProps) => {
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
           <Ellipsis className="h-4 w-4" />
-          <span className="sr-only">Abrir menu</span>
+          <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem onClick={handleView}>
           <Eye className="mr-2 h-4 w-4" />
-          Visualizar
+          View
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={handleEdit}>
           <Edit className="mr-2 h-4 w-4" />
-          Editar
+          Edit
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={handleDuplicate}>
           <Copy className="mr-2 h-4 w-4" />
-          Duplicar
+          Duplicate
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={handleToggleConfirmed}>
-          {isConfirmed ? (
-            <>
-              <XCircle className="mr-2 h-4 w-4" />
-              Marcar como pendente
-            </>
-          ) : (
-            <>
+        {!isConfirmed && (
+          <ConfirmTransactionScheduledAlert transactionId={transaction.id}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <CheckCircle className="mr-2 h-4 w-4" />
-              Marcar como confirmada
-            </>
-          )}
-        </DropdownMenuItem>
-
-        {!isScheduled && (
-          <DropdownMenuItem onClick={handleSchedule}>
-            <Calendar className="mr-2 h-4 w-4" />
-            Agendar
-          </DropdownMenuItem>
+              Make as confirmed
+            </DropdownMenuItem>
+          </ConfirmTransactionScheduledAlert>
         )}
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem onClick={handleCopy}>
           <FileText className="mr-2 h-4 w-4" />
-          Copiar ID
+          Copy ID
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={handleDelete}
-          className="text-red-600 focus:text-red-600">
-          <Trash2 className="mr-2 h-4 w-4" />
-          Excluir
-        </DropdownMenuItem>
+        <DeleteTransactionAlert transactionId={transaction.id}>
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            className="text-red-600 focus:text-red-600 cursor-pointer">
+            <Trash2 className="mr-2 h-4 w-4 stroke-red-600" />
+            Delete
+          </DropdownMenuItem>
+        </DeleteTransactionAlert>
       </DropdownMenuContent>
     </DropdownMenu>
   );

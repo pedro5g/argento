@@ -10,8 +10,6 @@ export function useGetPaginatedTransactions(
     queryKey: ["transactions", "paginated", params],
   });
 
-  console.log(data);
-
   return {
     transactions: data?.data,
     pagination: data?.pagination,

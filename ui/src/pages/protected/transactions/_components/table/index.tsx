@@ -20,7 +20,6 @@ import { SkeletonWrapper } from "./skeleton-wrapper";
 import { FacetedFilter } from "./faceted-filter";
 import { ColumnToggle } from "./column-toggle";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DownloadIcon,
   ChevronLeft,
@@ -43,6 +42,7 @@ import type { ListPaginatedTransactionsParams } from "@/api/api-types";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { columns } from "./columns";
 import { StatsCard } from "./stats-card";
+import { SearchInput } from "@/components/search-input";
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -269,11 +269,9 @@ export const TransactionsTable = () => {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
-          <Input
-            placeholder="Buscar transações..."
-            value={params.search || ""}
-            onChange={(e) => handleSearch(e.target.value || "")}
-            className="max-w-sm"
+          <SearchInput
+            searchQuery={params.search || ""}
+            setSearchQuery={handleSearch}
           />
         </div>
 

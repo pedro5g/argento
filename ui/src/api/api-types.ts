@@ -67,31 +67,27 @@ export type Transaction = {
 };
 
 export interface AccountFinancialSummary {
-  accountId: string;
-  accountName: string;
-  accountType: "bank" | "cash" | "digital" | "crypto";
-  currentBalance: number;
-
-  confirmedIncome: number;
-  pendingIncome: number;
-  totalIncome: number;
-
-  confirmedExpenses: number;
-  pendingExpenses: number;
-  totalExpenses: number;
-
-  confirmedNetBalance: number;
-  pendingNetBalance: number;
-  totalNetBalance: number;
+  account_id: string;
+  account_name: string;
+  account_type: "bank" | "cash" | "digital" | "crypto";
+  confirmed_expenses: string;
+  confirmed_expenses_count: number;
+  confirmed_income: string;
+  confirmed_income_count: number;
+  confirmed_net_balance: string;
+  current_balance: string;
+  pending_expenses: string;
+  pending_expenses_count: number;
+  pending_income: string;
+  pending_income_count: number;
+  pending_net_balance: string;
   projectedBalance: number;
-
-  confirmedIncomeCount: number;
-  confirmedExpensesCount: number;
-  pendingIncomeCount: number;
-  pendingExpensesCount: number;
-  totalTransactions: number;
   totalConfirmedTransactions: number;
   totalPendingTransactions: number;
+  totalTransactions: number;
+  total_expenses: string;
+  total_income: string;
+  total_net_balance: string;
 }
 
 export interface AccountPeriodSummary {
@@ -172,7 +168,7 @@ export type SetCurrentAccountResponseType = {
 };
 
 export type GetFinancialSummaryResponseType = {
-  data: AccountFinancialSummary | null;
+  data: AccountFinancialSummary;
 };
 
 export type GetCategoriesBodyType = {
@@ -325,4 +321,211 @@ export interface ListPaginatedTransactionsResponse {
   data: Transaction[];
   pagination: PaginationInfo;
   summary: TransactionsSummary;
+}
+
+export interface TransactionResponseType {
+  message: string;
+}
+
+export interface DeleteTransactionBodyType {
+  transactionId: string;
+}
+
+export interface ConfirmScheduledTransactionBodyType {
+  transactionId: string;
+}
+
+export interface FinancialSummaryResponseType {
+  success: true;
+  data: {
+    user_info: {
+      name: string;
+      email: string;
+    };
+    period: {
+      start: string;
+      end: string;
+    };
+    totals: {
+      total_income: number;
+      total_expense: number;
+      net_balance: number;
+    };
+    data: {
+      year: number;
+      months: {
+        [month: number]: {
+          month: number;
+          month_name: number;
+          days: {
+            id: number;
+            day: string;
+            total_income: number;
+            total_expense: number;
+            net_balance: number;
+            account_name: string;
+            account_type: string;
+          }[];
+          month_totals: {
+            income: number;
+            expense: number;
+            balance: number;
+          };
+        };
+      };
+      year_totals: {
+        income: number;
+        expense: number;
+        balance: number;
+      };
+    }[];
+    generated_at: string;
+  };
+}
+
+export interface FinancialExportResponse {
+  success: true;
+  data: {
+    user_info: {
+      name: string;
+      email: string;
+    };
+    period: {
+      start: string;
+      end: string;
+    };
+    totals: {
+      total_income: number;
+      total_expense: number;
+      net_balance: number;
+    };
+    data: {
+      year: number;
+      months: {
+        [month: number]: {
+          month: number;
+          month_name: number;
+          days: {
+            id: number;
+            day: string;
+            total_income: number;
+            total_expense: number;
+            net_balance: number;
+            account_name: string;
+            account_type: string;
+          }[];
+          month_totals: {
+            income: number;
+            expense: number;
+            balance: number;
+          };
+        };
+      };
+      year_totals: {
+        income: number;
+        expense: number;
+        balance: number;
+      };
+    }[];
+    generated_at: string;
+  };
+  export_info: {
+    generated_at: string;
+    user_id: string;
+    account_id: string;
+  };
+}
+
+export type FinancialPeriod =
+  | "today"
+  | "yesterday"
+  | "last_7_days"
+  | "last_30_days"
+  | "current_month"
+  | "last_month"
+  | "current_year"
+  | "last_year";
+
+export type DailyEntry = {
+  date: string;
+  day: number;
+  day_name: string;
+  month: number;
+  year: number;
+  income: number;
+  expense: number;
+  balance: number;
+  income_positive: number;
+  expense_negative: number;
+};
+
+export type Summary = {
+  total_income: number;
+  total_expense: number;
+  net_balance: number;
+  period: {
+    start: string;
+    end: string;
+  };
+  averages: {
+    daily_income: number;
+    daily_expense: number;
+    daily_balance: number;
+  };
+};
+
+export type ChartConfig = {
+  x_axis: string;
+  y_axes: string[];
+  colors: {
+    income: string;
+    expense: string;
+    balance: string;
+  };
+};
+
+export interface FinancialHistoryChartBodyType {
+  period: FinancialPeriod;
+}
+
+export interface FinancialHistoryChartResponseType {
+  success: boolean;
+  period: FinancialPeriod;
+  data: {
+    data: DailyEntry[];
+    summary: Summary;
+    chart_config: ChartConfig;
+  };
+}
+
+export type DailySummary = any;
+
+export type MonthlySummary = {
+  year: number;
+  month: number;
+  total_income: string;
+  total_expense: string;
+};
+
+export type CategoryTotal = {
+  category: string;
+  total: string;
+};
+
+export type GlobalSummary = {
+  total_income: string;
+  total_expense: string;
+  balance: string;
+};
+
+export interface GraphTransactionResponseType {
+  graphData: {
+    dailySummary: DailySummary[];
+    monthlySummary: MonthlySummary[];
+    categoryDistribution: {
+      income: CategoryTotal[];
+      expense: CategoryTotal[];
+    };
+    globalSummary: GlobalSummary;
+  };
 }

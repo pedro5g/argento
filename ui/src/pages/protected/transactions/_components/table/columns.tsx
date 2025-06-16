@@ -6,6 +6,20 @@ import { ColumnHeader } from "./column-header";
 import { Count } from "@/components/count";
 export const columns: ColumnDef<Transaction>[] = [
   {
+    accessorKey: "title",
+    header: () => <span>Title</span>,
+    cell: ({ row }) => <div className="font-medium">{row.original.title}</div>,
+  },
+  {
+    accessorKey: "description",
+    header: () => <span>Description</span>,
+    cell: ({ row }) => (
+      <div className="text-muted-foreground">
+        {row.original.description || "-"}
+      </div>
+    ),
+  },
+  {
     accessorKey: "category_name",
     header: () => <span>Category</span>,
     filterFn: (row, id, value) => {
@@ -21,20 +35,6 @@ export const columns: ColumnDef<Transaction>[] = [
           <span>{category_emoji}</span>
           <span>{category_name}</span>
         </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "title",
-    header: () => <span>Title</span>,
-    cell: ({ row }) => <div className="font-medium">{row.original.title}</div>,
-  },
-  {
-    accessorKey: "description",
-    header: () => <span>Description</span>,
-    cell: ({ row }) => (
-      <div className="text-muted-foreground">
-        {row.original.description || "-"}
       </div>
     ),
   },
@@ -61,7 +61,7 @@ export const columns: ColumnDef<Transaction>[] = [
             ? "text-emerald-500 bg-emerald-500/10"
             : "text-red-500 bg-red-500/10"
         )}>
-        {row.original.type === "income" ? "Receita" : "Despesa"}
+        {row.original.type}
       </div>
     ),
   },
