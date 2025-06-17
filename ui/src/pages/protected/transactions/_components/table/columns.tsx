@@ -134,4 +134,14 @@ export const columns: ColumnDef<Transaction>[] = [
     enableHiding: false,
     cell: ({ row }) => <RowActions transaction={row.original} />,
   },
+  {
+    id: "is_scheduled",
+    enableHiding: false,
+    aggregatedCell: ({ row }) => row.original.is_scheduled,
+  },
+  {
+    id: "recurrence",
+    enableHiding: false,
+    aggregatedCell: ({ row }) => row.original.recurrence,
+  },
 ];

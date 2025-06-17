@@ -9,7 +9,7 @@ class historyServices {
         $this->historyRepository = $historyRepo;
     }
 
-    public function getHistoryForPDF($userId, $accountId = null) {
+    public function getHistoryForPDF($userId, $accountId) {
         try {
             $data = $this->historyRepository->getHistoryForPDF($userId, $accountId);
             

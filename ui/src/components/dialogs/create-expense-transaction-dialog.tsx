@@ -171,7 +171,6 @@ export const CreateExpenseTransactionDialog = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/**Title */}
                   <div className="md:col-span-2">
                     <RHFInput<FormType>
                       label="Title"
@@ -182,7 +181,7 @@ export const CreateExpenseTransactionDialog = () => {
                       Briefly describe what this expense was for
                     </p>
                   </div>
-                  {/**Amount and Date */}
+
                   <div>
                     <RHFInput<FormType>
                       label="Amount"

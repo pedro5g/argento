@@ -4,39 +4,32 @@ import { ApiSetCurrentAccount } from "../endpoints";
 export function useSetCurrentAccount() {
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationFn: ({ accountId }: { accountId: string }) =>
       ApiSetCurrentAccount({ accountId }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({
-        queryKey: ["user-account"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["financial-summary"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["categories"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["clients"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["payment-methods"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["transactions"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["history"],
-      });
-      await queryClient.refetchQueries({
-        queryKey: ["financial-history"],
-      });
+      const keysToInvalidate = [
+        "user-account",
+        "financial-summary",
+        "categories",
+        "clients",
+        "payment-methods",
+        "transactions",
+        "history",
+        "financial-history",
+        "transaction-graph",
+      ];
+
+      await Promise.all(
+        keysToInvalidate.map((key) =>
+          queryClient.invalidateQueries({ queryKey: [key] })
+        )
+      );
     },
-    onError: async (error) => {
-      console.log(error);
+    onError: (error) => {
+      console.error("Erro ao trocar conta atual:", error);
     },
   });
 
-  return { mutate };
+  return { mutate, isPending, isError, error };
 }

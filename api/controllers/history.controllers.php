@@ -27,10 +27,7 @@ class HistoryControllers {
         }
     }
 
-    /**
-     * GET /api/history/chart
-     * Retorna dados formatados para gráficos
-     */
+  
     public function getHistoryForChart($req, $res) {
         try {
             $userId = $req->user['id'];
@@ -52,10 +49,7 @@ class HistoryControllers {
         }
     }
 
-    /**
-     * GET /api/history/summary
-     * Retorna resumo comparativo do histórico
-     */
+
     public function getHistorySummary($req, $res) {
         try {
             $userId = $req->user['id'];
@@ -75,10 +69,7 @@ class HistoryControllers {
         }
     }
 
-    /**
-     * GET /api/history/dashboard
-     * Retorna dados completos para dashboard
-     */
+  
     public function getDashboardData($req, $res) {
         try {
             $userId = $req->user['id'];
@@ -98,10 +89,7 @@ class HistoryControllers {
         }
     }
 
-    /**
-     * GET /api/history/chart/period/:period
-     * Retorna dados de gráfico para períodos predefinidos
-     */
+
     public function getChartByPeriod($req, $res) {
         try {
             $userId = $req->user['id'];
@@ -130,10 +118,7 @@ class HistoryControllers {
         }
     }
 
-    /**
-     * GET /api/history/export/pdf
-     * Força download do PDF (pode ser usado para trigger de download)
-     */
+ 
     public function exportPDF($req, $res) {
         try {
             $userId = $req->user['id'];
@@ -144,9 +129,7 @@ class HistoryControllers {
     
             $filename = 'financial_history_' . date('Y-m-d_H-i-s') . '.json';
             
-            return $res->header('Content-Type', 'application/json')
-                      ->header('Content-Disposition', "attachment; filename=\"{$filename}\"")
-                      ->json([
+            return $res->json([
                           "success" => true,
                           "data" => $data,
                           "export_info" => [
@@ -214,7 +197,6 @@ class HistoryControllers {
                 ];
             
             default:
-                // Default para mês atual
                 return [
                     'start' => date('Y-m-01'),
                     'end' => date('Y-m-t')

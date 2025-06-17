@@ -20,6 +20,57 @@ import { SkeletonWrapper } from "./skeleton-wrapper";
 import { FacetedFilter } from "./faceted-filter";
 import { ColumnToggle } from "./column-toggle";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+// AmountInput component adapted for filters
+interface AmountInputProps {
+  id: string;
+  value?: number;
+  onChange: (value?: number) => void;
+  placeholder?: string;
+}
+
+const AmountInput = ({
+  id,
+  value,
+  onChange,
+  placeholder = "0.00",
+}: AmountInputProps) => {
+  const cleanFormat = (value: string) => {
+    return value.replace(/\D/g, "").trim();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const cleanValue = cleanFormat(inputValue);
+
+    if (cleanValue === "" || cleanValue === "0") {
+      onChange(undefined);
+    } else {
+      onChange(parseFloat(cleanValue) / 100);
+    }
+  };
+
+  const displayValue = value
+    ? new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+      }).format(value)
+    : "";
+
+  return (
+    <Input
+      id={id}
+      type="text"
+      placeholder={placeholder}
+      className="pl-9"
+      value={displayValue}
+      onChange={handleChange}
+    />
+  );
+};
+import { Label } from "@/components/ui/label";
 import {
   DownloadIcon,
   ChevronLeft,
@@ -28,6 +79,9 @@ import {
   TrendingDown,
   Wallet,
   ArrowLeftRight,
+  CalendarIcon,
+  DollarSign,
+  FilterX,
 } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import {
@@ -37,6 +91,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { useGetPaginatedTransactions } from "@/api/hooks/use-get-paginated-transactions";
 import type { ListPaginatedTransactionsParams } from "@/api/api-types";
 import { mkConfig, generateCsv, download } from "export-to-csv";
@@ -55,6 +116,7 @@ export const TransactionsTable = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnsFilters] = useState<ColumnFiltersState>([]);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const params: ListPaginatedTransactionsParams = useMemo(() => {
     const getParam = (key: string) => {
@@ -158,6 +220,59 @@ export const TransactionsTable = () => {
     [updateParams]
   );
 
+  const handleDateChange = useCallback(
+    (type: "from" | "to", date?: Date) => {
+      if (!date) {
+        updateParams({
+          [type === "from" ? "date_from" : "date_to"]: undefined,
+          offset: 0,
+        });
+        return;
+      }
+
+      const localDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+      const dateString = format(localDate, "yyyy-MM-dd");
+
+      updateParams({
+        [type === "from" ? "date_from" : "date_to"]: dateString,
+        offset: 0,
+      });
+    },
+    [updateParams]
+  );
+  const handleAmountChange = useCallback(
+    (type: "min" | "max", value?: number) => {
+      updateParams({
+        [type === "min" ? "amount_min" : "amount_max"]: value,
+        offset: 0,
+      });
+    },
+    [updateParams]
+  );
+
+  const clearAllFilters = useCallback(() => {
+    updateParams({
+      type: undefined,
+      confirmed: undefined,
+      is_scheduled: undefined,
+      recurrence: undefined,
+      date_from: undefined,
+      date_to: undefined,
+      amount_min: undefined,
+      amount_max: undefined,
+      category_id: undefined,
+      account_id: undefined,
+      client_id: undefined,
+      payment_method_id: undefined,
+      search: undefined,
+      offset: 0,
+    });
+  }, [updateParams]);
+
   const handleExportCSV = useCallback(() => {
     if (!transactions?.length) return;
 
@@ -201,10 +316,11 @@ export const TransactionsTable = () => {
 
     transactions.forEach((transaction) => {
       const categoryName = transaction?.category_name;
+      const categoryEmoji = transaction?.category_emoji;
       if (categoryName && categoryName.trim() !== "") {
         categoriesMap.set(categoryName, {
           value: categoryName,
-          label: categoryName,
+          label: `${categoryEmoji} ${categoryName}`,
         });
       }
     });
@@ -216,6 +332,24 @@ export const TransactionsTable = () => {
     pagination && pagination.total > 0
       ? Math.floor((params.offset || 0) / (params.limit || 10)) + 1
       : 1;
+
+  const hasActiveFilters = useMemo(() => {
+    return !!(
+      params.type ||
+      params.confirmed !== undefined ||
+      params.is_scheduled !== undefined ||
+      params.recurrence ||
+      params.date_from ||
+      params.date_to ||
+      params.amount_min ||
+      params.amount_max ||
+      params.category_id ||
+      params.account_id ||
+      params.client_id ||
+      params.payment_method_id ||
+      params.search
+    );
+  }, [params]);
 
   return (
     <div className="w-full space-y-4">
@@ -267,48 +401,187 @@ export const TransactionsTable = () => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <SearchInput
-            searchQuery={params.search || ""}
-            setSearchQuery={handleSearch}
-          />
-        </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <SearchInput
+              searchQuery={params.search || ""}
+              setSearchQuery={handleSearch}
+            />
+          </div>
 
-        <div className="flex flex-wrap gap-2">
-          <FacetedFilter
-            title="Transaction type"
-            column={table.getColumn("type")}
-            options={[
-              { label: "Income", value: "income" },
-              { label: "Expense", value: "expense" },
-            ]}
-            onFilterChange={(value) => handleFilterChange("type", value?.[0])}
-          />
-
-          <FacetedFilter
-            title="Status"
-            column={table.getColumn("confirmed")}
-            options={[
-              { label: "Confirmed", value: "true" },
-              { label: "Pending", value: "false" },
-            ]}
-            onFilterChange={(value) =>
-              handleFilterChange("confirmed", value?.[0])
-            }
-          />
-
-          {categoriesOptions.length > 0 && (
+          <div className="flex flex-wrap gap-2">
             <FacetedFilter
-              title="Category"
-              column={table.getColumn("category_name")}
-              options={categoriesOptions}
+              title="Transaction type"
+              column={table.getColumn("type")}
+              options={[
+                { label: "Income", value: "income" },
+                { label: "Expense", value: "expense" },
+              ]}
+              onFilterChange={(value) => handleFilterChange("type", value?.[0])}
+            />
+
+            <FacetedFilter
+              title="Status"
+              column={table.getColumn("confirmed")}
+              options={[
+                { label: "Confirmed", value: "true" },
+                { label: "Pending", value: "false" },
+              ]}
               onFilterChange={(value) =>
-                handleFilterChange("category_name", value?.[0])
+                handleFilterChange("confirmed", value?.[0])
               }
             />
-          )}
+
+            {/* <FacetedFilter
+              title="Scheduled"
+              column={table.getColumn("is_scheduled")}
+              options={[
+                { label: "Scheduled", value: "true" },
+                { label: "Not Scheduled", value: "false" },
+              ]}
+              onFilterChange={(value) =>
+                handleFilterChange("is_scheduled", value?.[0])
+              }
+            /> */}
+
+            {categoriesOptions.length > 0 && (
+              <FacetedFilter
+                title="Category"
+                column={table.getColumn("category_name")}
+                options={categoriesOptions}
+                onFilterChange={(value) =>
+                  handleFilterChange("category_name", value?.[0])
+                }
+              />
+            )}
+
+            {/* <FacetedFilter
+              title="Recurrence"
+              column={table.getColumn("recurrence")}
+              options={[
+                { label: "Daily", value: "daily" },
+                { label: "Weekly", value: "weekly" },
+                { label: "Monthly", value: "monthly" },
+                { label: "Yearly", value: "yearly" },
+              ]}
+              onFilterChange={(value) =>
+                handleFilterChange("recurrence", value?.[0])
+              }
+            /> */}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
+              Advanced Filters
+            </Button>
+
+            {hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={clearAllFilters}>
+                <FilterX className="mr-2 size-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </div>
+
+        {showAdvancedFilters && (
+          <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+            <h3 className="text-sm font-medium">Advanced Filters</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="date_from">Date From</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {params.date_from
+                        ? format(
+                            new Date(params.date_from + "T00:00:00"),
+                            "dd/MM/yyyy"
+                          )
+                        : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        params.date_from
+                          ? new Date(params.date_from + "T00:00:00")
+                          : undefined
+                      }
+                      onSelect={(date) => handleDateChange("from", date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date_to">Date To</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {params.date_to
+                        ? format(
+                            new Date(params.date_to + "T00:00:00"),
+                            "dd/MM/yyyy"
+                          )
+                        : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        params.date_to
+                          ? new Date(params.date_to + "T00:00:00")
+                          : undefined
+                      }
+                      onSelect={(date) => handleDateChange("to", date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="amount_min">Min Amount</Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <AmountInput
+                    id="amount_min"
+                    value={params.amount_min}
+                    onChange={(value) => handleAmountChange("min", value)}
+                    placeholder="R$ 0,00"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="amount_max">Max Amount</Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <AmountInput
+                    id="amount_max"
+                    value={params.amount_max}
+                    onChange={(value) => handleAmountChange("max", value)}
+                    placeholder="R$ 0,00"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2">
           <Select

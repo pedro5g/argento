@@ -86,7 +86,7 @@ class TransactionControllers {
                 'order_direction' => $req->query['order_direction'] ?? null,
             ];
             
-           
+            
             $options = array_filter($options, function($value) {
                 return $value !== null && $value !== '';
             });
@@ -172,8 +172,8 @@ class TransactionControllers {
 
     public function getGraphData($req, $res) {
         try {
-            $userId = $req->user['id'];
-            $graphData = $this->transactionServices->getGraphData($userId);
+            $accountId = $req->account['id'];
+            $graphData = $this->transactionServices->getGraphData($accountId);
             return $res->json(["graphData" => $graphData]);
         } catch (Exception $e) {
             return $res->status(500)->json(["error" => $e->getMessage()]);

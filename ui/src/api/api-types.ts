@@ -498,7 +498,11 @@ export interface FinancialHistoryChartResponseType {
   };
 }
 
-export type DailySummary = any;
+export type DailySummary = {
+  date: string;
+  total_income: string;
+  total_expense: string;
+};
 
 export type MonthlySummary = {
   year: number;
@@ -509,6 +513,7 @@ export type MonthlySummary = {
 
 export type CategoryTotal = {
   category: string;
+  category_emoji: string;
   total: string;
 };
 

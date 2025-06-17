@@ -52,7 +52,6 @@ export function ColumnToggle<TData>({ table }: ColumnToggleProps<TData>) {
   );
 }
 
-// Helper function to get user-friendly column names
 function getColumnDisplayName(columnId: string): string {
   const columnNames: Record<string, string> = {
     category_name: "Categoria",

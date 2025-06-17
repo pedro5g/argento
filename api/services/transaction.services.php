@@ -174,9 +174,12 @@ class TransactionServices {
         
     
         $booleanFields = ['is_scheduled'];
+       
         foreach ($booleanFields as $field) {
             if (isset($options[$field])) {
-                $sanitized[$field] = filter_var($options[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                
+                $sanitized[$field] = $options[$field] === 'true' ? 1 : 0;
+                
             }
         }
         
@@ -313,15 +316,15 @@ class TransactionServices {
         return $analytics;
     }
 
-    public function getGraphData($userId) {
+    public function getGraphData($accountId) {
         return [
-            'dailySummary' => $this->transactionRepository->getDailySummary($userId),
-            'monthlySummary' => $this->transactionRepository->getMonthlySummary($userId),
+            'dailySummary' => $this->transactionRepository->getDailySummary($accountId),
+            'monthlySummary' => $this->transactionRepository->getMonthlySummary($accountId),
             'categoryDistribution' => [
-                'income' => $this->transactionRepository->getCategoryDistribution($userId, 'income'),
-                'expense' => $this->transactionRepository->getCategoryDistribution($userId, 'expense')
+                'income' => $this->transactionRepository->getCategoryDistribution($accountId, 'income'),
+                'expense' => $this->transactionRepository->getCategoryDistribution($accountId, 'expense')
             ],
-            'globalSummary' => $this->transactionRepository->getGlobalSummary($userId)
+            'globalSummary' => $this->transactionRepository->getGlobalSummary($accountId)
         ];
     }
 
@@ -333,9 +336,6 @@ class TransactionServices {
         return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $uuid);
     }
 
-    // public function getPendingTransactions($accountId) {
-    //     return $this->transactionRepository->getScheduledPendingTransactions($accountId);
-    // }
     
     public function simulatePendingImpact($accountId) {
         $transactions = $this->transactionRepository->getScheduledPendingTransactions($accountId);
@@ -366,15 +366,7 @@ class TransactionServices {
             throw new Exception("Transaction not found or unauthorized");
         }
     
-        if (!$transaction['is_scheduled'] || $transaction['confirmed']) {
-            throw new Exception("Transaction is not pending confirmation");
-        }
-    
-        $now = date('Y-m-d');
-        if ($now < $transaction['scheduled_date']) {
-            throw new Exception("Scheduled date not reached");
-        }
-    
+
         $this->transactionRepository->confirmTransaction($transactionId);
     
         

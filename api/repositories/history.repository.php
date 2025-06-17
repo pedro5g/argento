@@ -7,50 +7,62 @@ class HistoryRepository {
     }
     
 
-    public function getHistoryForPDF($userId, $accountId = null) {
+    public function getHistoryForPDF($userId, $accountId) {
         $sql = "
-            SELECT 
-                h.id,
-                h.day,
-                h.month,
-                h.year,
-                h.total_income,
-                h.total_expense,
-                h.net_balance,
-                a.name as account_name,
-                a.type as account_type,
-                u.name as user_name,
-                u.email as user_email
-            FROM history h
-            INNER JOIN accounts a ON h.account_id = a.id
-            INNER JOIN users u ON a.user_id = u.id
-            WHERE u.id = :user_id
+        SELECT
+            h.id,
+            h.day,
+            h.month,
+            h.year,
+            h.total_income,
+            h.total_expense,
+            h.net_balance,
+            a.name AS account_name,
+            a.type AS account_type,
+            u.name AS user_name,
+            u.email AS user_email
+        FROM history h
+        INNER JOIN accounts a ON h.account_id = a.id
+        INNER JOIN users u ON a.user_id = u.id
+        WHERE h.account_id = :account_id 
+        AND a.user_id = :user_id
         ";
-        
-        $params = ['user_id' => $userId];
-        
-        if ($accountId) {
-            $sql .= " AND h.account_id = :account_id";
-            $params['account_id'] = $accountId;
-        }
-        
+    
+        $params = [
+            'account_id' => $accountId,
+            'user_id' => $userId
+        ];
+       
         $sql .= " ORDER BY h.year DESC, h.month DESC, h.day DESC";
-        
+       
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+       
+       
+        if (empty($results)) {
+           
+            $checkSql = "SELECT COUNT(*) as count FROM accounts WHERE id = :account_id AND user_id = :user_id";
+            $checkStmt = $this->pdo->prepare($checkSql);
+            $checkStmt->execute($params);
+            $accountExists = $checkStmt->fetch(PDO::FETCH_ASSOC)['count'] > 0;
+            
+            if (!$accountExists) {
+                throw new Exception("Conta não encontrada ou não pertence ao usuário.");
+            }
+        }
+       
         $organized = [];
         $totals = [
             'total_income' => 0,
             'total_expense' => 0,
             'net_balance' => 0
         ];
-        
+       
         foreach ($results as $row) {
             $year = $row['year'];
             $month = $row['month'];
-            
+           
             if (!isset($organized[$year])) {
                 $organized[$year] = [
                     'year' => $year,
@@ -62,11 +74,18 @@ class HistoryRepository {
                     ]
                 ];
             }
-            
+           
             if (!isset($organized[$year]['months'][$month])) {
+               
+                $monthNames = [
+                    1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril',
+                    5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
+                    9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'
+                ];
+                
                 $organized[$year]['months'][$month] = [
                     'month' => $month,
-                    'month_name' => $month,
+                    'month_name' => $monthNames[$month] ?? $month,
                     'days' => [],
                     'month_totals' => [
                         'income' => 0,
@@ -75,45 +94,55 @@ class HistoryRepository {
                     ]
                 ];
             }
-            
+           
             $organized[$year]['months'][$month]['days'][] = [
                 'id' => $row['id'],
                 'day' => $row['day'],
+                'day_formatted' => date('d/m/Y', strtotime($row['day'])),
                 'total_income' => (float) $row['total_income'],
                 'total_expense' => (float) $row['total_expense'],
                 'net_balance' => (float) $row['net_balance'],
                 'account_name' => $row['account_name'],
                 'account_type' => $row['account_type']
             ];
-   
+    
+           
             $organized[$year]['months'][$month]['month_totals']['income'] += (float) $row['total_income'];
             $organized[$year]['months'][$month]['month_totals']['expense'] += (float) $row['total_expense'];
             $organized[$year]['months'][$month]['month_totals']['balance'] += (float) $row['net_balance'];
-
+            
+           
             $organized[$year]['year_totals']['income'] += (float) $row['total_income'];
             $organized[$year]['year_totals']['expense'] += (float) $row['total_expense'];
             $organized[$year]['year_totals']['balance'] += (float) $row['net_balance'];
-  
+    
+           
             $totals['total_income'] += (float) $row['total_income'];
             $totals['total_expense'] += (float) $row['total_expense'];
             $totals['net_balance'] += (float) $row['net_balance'];
         }
-        
+       
         return [
             'user_info' => !empty($results) ? [
                 'name' => $results[0]['user_name'],
                 'email' => $results[0]['user_email']
             ] : null,
+            'account_info' => !empty($results) ? [
+                'name' => $results[0]['account_name'],
+                'type' => $results[0]['account_type']
+            ] : null,
             'period' => [
                 'start' => !empty($results) ? end($results)['day'] : null,
-                'end' => !empty($results) ? $results[0]['day'] : null
+                'end' => !empty($results) ? $results[0]['day'] : null,
+                'start_formatted' => !empty($results) ? date('d/m/Y', strtotime(end($results)['day'])) : null,
+                'end_formatted' => !empty($results) ? date('d/m/Y', strtotime($results[0]['day'])) : null
             ],
             'totals' => $totals,
             'data' => array_values($organized),
-            'generated_at' => date('Y-m-d H:i:s')
+            'generated_at' => date('Y-m-d H:i:s'),
+            'generated_at_formatted' => date('d/m/Y H:i:s')
         ];
     }
-    
 
     public function getHistoryForChart($userId, $accountId = null, $startDate = null, $endDate = null) {
 

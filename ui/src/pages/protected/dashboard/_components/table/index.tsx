@@ -28,9 +28,10 @@ const recent = {
 
 export function TransactionsMineTable() {
   const [mode, setMode] = useState<"scheduled" | "recent">("scheduled");
-
-  const defaultParams: ListPaginatedTransactionsParams =
-    mode === "scheduled" ? scheduled : recent;
+  const [defaultParams, setDefaultParams] =
+    useState<ListPaginatedTransactionsParams>(() =>
+      mode === "scheduled" ? scheduled : recent
+    );
 
   const { transactions, pagination, isPending } =
     useGetPaginatedTransactions(defaultParams);
@@ -38,7 +39,9 @@ export function TransactionsMineTable() {
   const isScheduled = mode === "scheduled";
 
   const handleNextPage = () => {
-    defaultParams.limit = (defaultParams.limit || 5) + 5;
+    setDefaultParams(({ limit, ...prev }) => {
+      return { ...prev, limit: (limit || 5) + 5 };
+    });
   };
 
   return (
@@ -173,7 +176,7 @@ export function TransactionsMineTable() {
                 ))
               ) : (
                 <p className="px-4 py-4 text-sm text-zinc-500">
-                  Nenhuma transação encontrada.
+                  No transactions found
                 </p>
               )}
             </div>

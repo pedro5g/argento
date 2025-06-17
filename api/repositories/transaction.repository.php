@@ -46,7 +46,7 @@ class TransactionRepository {
             ]);
 
             $this->updateAccountBalance($data['account_id'], $data['amount'], $data['type']);
-            $this->updateHistory($data['date'], $data['amount'], $data['type']);
+            $this->updateHistory($data['date'], $data['amount'], $data['type'], $data['account_id']);
 
             $this->pdo->commit();
         } catch (Exception $e) {
@@ -65,25 +65,25 @@ class TransactionRepository {
     }
     
 
-    private function updateHistory($date, $amount, $type) {
-        $stmt = $this->pdo->prepare("SELECT id FROM history WHERE day = ?");
-        $stmt->execute([$date]);
+    private function updateHistory($date, $amount, $type, $accountId) {
+        $stmt = $this->pdo->prepare("SELECT id FROM history WHERE day = ? AND account_id = ?");
+        $stmt->execute([$date, $accountId]);
         $history = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($history) {
             if ($type === 'income') {
-                $stmt = $this->pdo->prepare("UPDATE history SET total_income = total_income + ? WHERE day = ?");
+                $stmt = $this->pdo->prepare("UPDATE history SET total_income = total_income + ? WHERE day = ? AND account_id = ?");
             } else {
-                $stmt = $this->pdo->prepare("UPDATE history SET total_expense = total_expense + ? WHERE day = ?");
+                $stmt = $this->pdo->prepare("UPDATE history SET total_expense = total_expense + ? WHERE day = ? AND account_id = ?");
             }
-            $stmt->execute([$amount, $date]);
+            $stmt->execute([$amount, $date, $accountId]);
         } else {
             if ($type === 'income') {
-                $stmt = $this->pdo->prepare("INSERT INTO history (day, total_income) VALUES (?, ?)");
+                $stmt = $this->pdo->prepare("INSERT INTO history (day, total_income, account_id) VALUES (?, ?, ?)");
             } else {
-                $stmt = $this->pdo->prepare("INSERT INTO history (day, total_expense) VALUES (?, ?)");
+                $stmt = $this->pdo->prepare("INSERT INTO history (day, total_expense, account_id) VALUES (?, ?, ?)");
             }
-            $stmt->execute([$date, $amount]);
+            $stmt->execute([$date, $amount, $accountId]);
         }
     }
 
@@ -156,7 +156,6 @@ class TransactionRepository {
     public function listTransactionsPaginated($userId, $options = []) {
         $limit = (int)($options['limit'] ?? 10);
         $offset = (int)($options['offset'] ?? 0);
-        
         
         $limit = max(1, min(1000, $limit)); 
         $offset = max(0, $offset);
@@ -249,13 +248,13 @@ class TransactionRepository {
                 $filters[] = "t.confirmed IS NULL";
             } else {
                 $filters[] = "t.confirmed = ?";
-                $params[] = (bool) $options['confirmed'];
+                $params[] = $options['confirmed'] ? 1 : 0;
             }
         }
         
         if (isset($options['is_scheduled'])) {
             $filters[] = "t.is_scheduled = ?";
-            $params[] = (bool) $options['is_scheduled'];
+            $params[] = $options['is_scheduled'] ? 1 : 0;
         }
         
         if (!empty($options['recurrence'])) {
@@ -291,15 +290,15 @@ class TransactionRepository {
         if (!in_array($orderDirection, ['ASC', 'DESC'])) {
             $orderDirection = 'DESC';
         }
-        
+       
         $sql .= " ORDER BY t.$orderBy $orderDirection";
-        
         $sql .= " LIMIT $limit OFFSET $offset";
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+   
 
     public function getDailySummary($accountId) {
         $stmt = $this->pdo->prepare("
@@ -317,7 +316,7 @@ class TransactionRepository {
     }
 
    
-    public function getMonthlySummary($userId) {
+    public function getMonthlySummary($accountId) {
         $stmt = $this->pdo->prepare("
             SELECT 
                 YEAR(date) AS year,
@@ -325,39 +324,40 @@ class TransactionRepository {
                 SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS total_income,
                 SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS total_expense
             FROM transactions
-            WHERE user_id = ?
+            WHERE account_id = ?
             GROUP BY year, month
             ORDER BY year, month
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$accountId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getCategoryDistribution($userId, $type = 'expense') {
+    public function getCategoryDistribution($accountId, $type = 'expense') {
         $stmt = $this->pdo->prepare("
             SELECT 
                 c.name AS category,
+                c.emoji AS category_emoji,
                 SUM(t.amount) AS total
             FROM transactions t
             JOIN categories c ON t.category_id = c.id
-            WHERE t.user_id = ? AND t.type = ?
+            WHERE t.account_id = ? AND t.type = ?
             GROUP BY t.category_id
         ");
-        $stmt->execute([$userId, $type]);
+        $stmt->execute([$accountId, $type]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
    
-    public function getGlobalSummary($userId) {
+    public function getGlobalSummary($accountId) {
         $stmt = $this->pdo->prepare("
             SELECT
                 SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS total_income,
                 SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS total_expense,
                 SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) AS balance
             FROM transactions
-            WHERE user_id = ?
+            WHERE account_id = ?
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$accountId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

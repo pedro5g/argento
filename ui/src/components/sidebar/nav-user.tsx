@@ -1,12 +1,9 @@
-"use client";
-
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -69,17 +66,7 @@ export const NavUser = ({ userAccount }: NavUserProps) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <BadgeCheck />
-            Account
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Bell />
-            Notifications
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+
         <DropdownMenuItem onClick={logout} className="cursor-pointer">
           <LogOut />
           Log out

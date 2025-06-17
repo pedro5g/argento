@@ -19,10 +19,11 @@ interface FinancialHistoryPDFProps {
 }
 
 export const FinancialHistoryPDF = ({ children }: FinancialHistoryPDFProps) => {
-  const { data, isPending } = useHistoryForPDF();
-  const { mutate: exportAsJSON, isPending: isExporting } = useExportPDF();
+  const { data, isPending, error } = useHistoryForPDF();
 
-  if (!data || !data.data || isPending) {
+  const { mutate: exportAsJSON, isPending: isExporting } = useExportPDF();
+  console.log(error);
+  if (!data || !data.data || isPending || error) {
     return (
       <Dialog>
         <DialogTrigger asChild>{children}</DialogTrigger>

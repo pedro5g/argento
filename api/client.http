@@ -1,5 +1,5 @@
 @baseURL = http://localhost/finance-app/api/index.php/api
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NTAwMDM3MDQsImV4cCI6MTc1MDAwNzMwNH0.UTKUwWKxWGXBRghTP7gNEfDhVFFBs-BqeEEdkmbzDiQ
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOWNlY2M5Yy0zZmNmLTQzYzItOWU2ZC0xMWVlNTFhMGU5MTQiLCJpYXQiOjE3NTAwMzkyMjksImV4cCI6MTc1MDA0MjgyOX0.68-KaMkvni_xm1Kwe43oDqUBI_WzR6mHAgmcYPklSTQ
 
 
 ### @name listAllUsers
@@ -323,4 +323,8 @@ Authorization: Bearer {{token}}
 
 ### @name get_history_for_FDP
 GET {{baseURL}}/history/pdf
+Authorization: Bearer {{token}}
+
+### @name get_history_chart
+GET {{baseURL}}/history/chart/period/current_mount
 Authorization: Bearer {{token}}
