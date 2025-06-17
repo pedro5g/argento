@@ -374,7 +374,7 @@ class TransactionRepository {
         $stmt = $this->pdo->prepare("
             UPDATE transactions
             SET confirmed = 1
-            WHERE id = ?
+            WHERE id = ? AND confirmed = 0
         ");
         $stmt->execute([$transactionId]);
     }

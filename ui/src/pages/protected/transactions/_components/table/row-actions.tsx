@@ -10,6 +10,7 @@ import {
 import { Trash2, CheckCircle, FileText, Ellipsis } from "lucide-react";
 import { DeleteTransactionAlert } from "../dialog/delete-transaction-alert";
 import { ConfirmTransactionScheduledAlert } from "../dialog/confirm-transaction-scheduled-alert";
+// import { TransactionEditModal } from "@/components/dialogs/transaction-edit-dialog";
 
 interface RowActionsProps {
   transaction: Transaction;
@@ -42,8 +43,9 @@ export const RowActions = ({ transaction }: RowActionsProps) => {
           </ConfirmTransactionScheduledAlert>
         )}
 
-        <DropdownMenuSeparator />
-
+        {/* <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <TransactionEditModal transaction={transaction} />
+        </DropdownMenuItem> */}
         <DropdownMenuItem onClick={handleCopy}>
           <FileText className="mr-2 h-4 w-4" />
           Copy ID

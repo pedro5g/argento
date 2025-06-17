@@ -62,7 +62,7 @@ export type Transaction = {
   payment_method_emoji: string | null;
   recurrence: string;
   scheduled_date: string | null;
-  type: CategoryTypes;
+  type: "expense" | "income";
   user_id: string;
 };
 

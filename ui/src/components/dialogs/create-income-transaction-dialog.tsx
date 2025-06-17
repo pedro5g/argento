@@ -100,6 +100,7 @@ export const CreateIncomeTransactionDialog = () => {
     onSuccess: ({ message }) => {
       console.log(message);
       forms.reset();
+      setOpen(false);
     },
     onError: (error: ApiError) => {
       console.error(error);

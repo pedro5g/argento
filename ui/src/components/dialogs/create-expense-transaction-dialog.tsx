@@ -102,6 +102,7 @@ export const CreateExpenseTransactionDialog = () => {
     onSuccess: ({ message }) => {
       console.log(message);
       forms.reset();
+      setOpen(false);
     },
     onError: (error: ApiError) => {
       console.error(error);
@@ -231,7 +232,6 @@ export const CreateExpenseTransactionDialog = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Category */}
                   <div className="space-y-1">
                     <Label className="text-gray-700 font-medium flex items-center gap-2">
                       <Tag className="h-4 w-4 text-blue-600" />
@@ -259,11 +259,10 @@ export const CreateExpenseTransactionDialog = () => {
               <CardContent>
                 <div className="w-full space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    {/* Recurrence */}
                     <div>
                       <Label className="text-gray-700 font-medium flex items-center gap-2 mb-1">
                         <User className="h-4 w-4 text-blue-600" />
-                        Client
+                        Recurrence
                       </Label>
                       <RHFSelect<FormType>
                         name="recurrence"

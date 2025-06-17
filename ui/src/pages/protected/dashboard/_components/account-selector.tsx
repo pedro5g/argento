@@ -50,7 +50,7 @@ export const AccountsSection = ({ userAccount }: AccountSectionProps) => {
               data-[type='digital']:from-purple-500 data-[type='digital']:to-purple-600 
               data-[type='crypto']:from-amber-600 data-[type='crypto']:to-amber-500 
               rounded-2xl p-6 text-white relative overflow-hidden">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-10">
               <div>
                 <p className="text-sm opacity-80">{currentAccount.name}</p>
                 <p className="text-xs opacity-70 capitalize">
@@ -80,12 +80,12 @@ export const AccountsSection = ({ userAccount }: AccountSectionProps) => {
               </div>
             </div>
 
-            <div className="flex justify-between mt-6 pt-2 border-t border-white/30 text-xs opacity-90">
+            {/* <div className="flex justify-between mt-6 pt-2 border-t border-white/30 text-xs opacity-90">
               <p>Projected Balance:</p>
               <p className="font-medium">
                 {formatCurrency(financialSummary.projectedBalance.toString())}
               </p>
-            </div>
+            </div> */}
 
             <div className="absolute top-4 right-4 w-12 h-8 bg-white/20 rounded"></div>
             <div className="absolute top-6 right-6 w-8 h-6 bg-white/20 rounded"></div>

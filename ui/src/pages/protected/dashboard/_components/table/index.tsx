@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { useGetPaginatedTransactions } from "@/api/hooks/use-get-paginated-transactions";
 import { Count } from "@/components/count";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ListPaginatedTransactionsParams } from "@/api/api-types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -29,19 +29,26 @@ const recent = {
 export function TransactionsMineTable() {
   const [mode, setMode] = useState<"scheduled" | "recent">("scheduled");
   const [defaultParams, setDefaultParams] =
-    useState<ListPaginatedTransactionsParams>(() =>
-      mode === "scheduled" ? scheduled : recent
-    );
+    useState<ListPaginatedTransactionsParams>(scheduled);
 
   const { transactions, pagination, isPending } =
     useGetPaginatedTransactions(defaultParams);
 
   const isScheduled = mode === "scheduled";
 
+  useEffect(() => {
+    setDefaultParams(mode === "scheduled" ? scheduled : recent);
+  }, [mode]);
+
   const handleNextPage = () => {
-    setDefaultParams(({ limit, ...prev }) => {
-      return { ...prev, limit: (limit || 5) + 5 };
-    });
+    setDefaultParams((prev) => ({
+      ...prev,
+      limit: (prev.limit || 5) + 5,
+    }));
+  };
+
+  const handleModeChange = (newMode: "scheduled" | "recent") => {
+    setMode(newMode);
   };
 
   return (
@@ -60,7 +67,9 @@ export function TransactionsMineTable() {
         <div>
           <select
             value={mode}
-            onChange={(e) => setMode(e.target.value as "scheduled" | "recent")}
+            onChange={(e) =>
+              handleModeChange(e.target.value as "scheduled" | "recent")
+            }
             className="text-sm border border-zinc-300 rounded-md px-2 py-1 bg-white">
             <option value="scheduled">Scheduled</option>
             <option value="recent">Recent</option>
