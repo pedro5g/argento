@@ -378,7 +378,8 @@ class TransactionServices {
         $this->transactionRepository->updateHistory(
             $transaction['date'], 
             $transaction['amount'], 
-            $transaction['type']
+            $transaction['type'],
+            $transaction['account_id']
         );
     }
     
